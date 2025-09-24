@@ -89,7 +89,7 @@ const defaultRoutes: RouteRecordRaw[] = [
       {
         path: '/404',
         name: '404',
-        meta: { title: '404' },
+        meta: { title: '404', keepalive: 1 },
         component: () => import('@/components/404/index.vue')
       }
     ]
@@ -100,8 +100,8 @@ const defaultRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: 'center',
-        name: 'user-center',
-        meta: { title: '个人中心' },
+        name: 'users-center',
+        meta: { title: '个人中心', keepalive: 1 },
         component: () => import('@/views/user/center.vue')
       }
     ]
@@ -115,6 +115,7 @@ const defaultRoutes: RouteRecordRaw[] = [
 ]
 
 const routes = constantRoutes.concat(defaultRoutes)
+console.log(routes)
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
