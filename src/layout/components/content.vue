@@ -13,7 +13,7 @@
               <component :is="Component" :key="routeKey" />
             </keep-alive>
 
-            <!--  <component :is="Component" :key="routeKey" />-->
+            <component v-else :is="Component" :key="routeKey" />
           </transition>
         </router-view>
       </div>

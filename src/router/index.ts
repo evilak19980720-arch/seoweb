@@ -21,7 +21,7 @@ const notInProdRoute = () => {
             name: 'modules',
             meta: {
               title: '模块管理',
-              keepalive: 1
+              keepalive: 0
             },
             component: () => import('@/views/develop/module/index.vue')
           },
@@ -30,14 +30,14 @@ const notInProdRoute = () => {
             name: 'schemas',
             meta: {
               title: 'Schema',
-              keepalive: 1
+              keepalive: 0
             },
             component: () => import('@/views/develop/schema/index.vue')
           },
           {
             path: 'generate/:schema',
             name: 'generate',
-            meta: { title: '代码生成', hidden: true, active_menu: '/develop/schemas', keepalive: 1 },
+            meta: { title: '代码生成', hidden: true, active_menu: '/develop/schemas', keepalive: 0 },
             component: () => import('@/views/develop/generate/index.vue')
           }
         ]
@@ -45,7 +45,7 @@ const notInProdRoute = () => {
       {
         path: '/develop',
         component: () => import('@/layout/index.vue'),
-        meta: { title: '开发工具', icon: 'wrench-screwdriver', hidden: isGenerate(), keepalive: 1 },
+        meta: { title: '开发工具', icon: 'wrench-screwdriver', hidden: isGenerate(), keepalive: 0 },
         children: [
           {
             path: 'generates',
