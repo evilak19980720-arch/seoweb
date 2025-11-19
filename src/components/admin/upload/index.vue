@@ -9,7 +9,7 @@
     v-bind="$attrs"
     :on-success="handleSuccess"
   >
-    <img v-if="fileModel" :src="fileModel" class="avatar" />
+    <img v-if="fileModel" :src="fileModel" :class="imageClass" />
     <div v-else>
       <div class="flex justify-center items-center w-20 h-20 border border-collapse">
         <el-icon><Plus /></el-icon>
