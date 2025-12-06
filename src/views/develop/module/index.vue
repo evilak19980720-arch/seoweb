@@ -43,22 +43,10 @@
       <template #status="scope">
         <Status v-model="scope.row.enable" :id="scope.row.name" :api="api" @refresh="refresh" />
       </template>
-      <template #operation>
-        <!-- header 插槽的内容放这里 -->
-        <el-button type="success" class="float-right" @click="installVisible = true">
-          <Icon name="cog-6-tooth" class="w-4 h-4 mr-1" />
-          安装
-        </el-button>
-      </template>
-
       <template #dialog="row">
         <Create :primary="row?.name" :api="api" />
       </template>
     </catch-table>
-    <!-- 安装 -->
-    <Dialog v-model="installVisible" title="安装模块" destroy-on-close>
-      <Install />
-    </Dialog>
   </div>
 </template>
 
