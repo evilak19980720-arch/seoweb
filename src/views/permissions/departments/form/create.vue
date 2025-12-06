@@ -4,16 +4,16 @@
       <el-cascader :options="departments" name="parent_id" v-model="formData.parent_id" clearable :props="{ value: 'id', label: 'department_name', checkStrictly: true }" class="w-full" />
     </el-form-item>
     <el-form-item label="部门名称" prop="department_name" :rules="[{ required: true, message: '部门名称必须填写' }]">
-      <el-input v-model="formData.department_name" name="department_name" clearable />
+      <el-input v-model="formData.department_name" name="department_name" clearable show-word-limit maxlength="30" />
     </el-form-item>
     <el-form-item label="部门联系人" prop="principal">
-      <el-input v-model="formData.principal" name="principal" clearable />
+      <el-input v-model="formData.principal" name="principal" clearable show-word-limit maxlength="30" />
     </el-form-item>
     <el-form-item label="手机号" prop="mobile">
-      <el-input v-model="formData.mobile" name="mobile" clearable />
+      <el-input v-model="formData.mobile" name="mobile" clearable show-word-limit maxlength="20" />
     </el-form-item>
     <el-form-item label="邮箱" prop="email">
-      <el-input v-model="formData.email" name="email" clearable />
+      <el-input v-model="formData.email" name="email" clearable show-word-limit maxlength="100" />
     </el-form-item>
     <el-form-item label="排序" prop="sort">
       <el-input-number v-model="formData.sort" name="sort" :min="1" />
@@ -29,7 +29,7 @@
 import { useCreate } from '@/composables/curd/useCreate'
 import { useShow } from '@/composables/curd/useShow'
 import http from '@/support/http'
-import { onMounted, ref, unref } from 'vue'
+import { inject, onMounted, ref, unref } from 'vue'
 
 const props = defineProps({
   primary: [String, Number],
@@ -65,16 +65,13 @@ if (props.primary) {
   }
 }
 
-const emit = defineEmits(['close'])
-
+const closeDialog = inject('closeDialog')
 const departments = ref()
 onMounted(() => {
   http.get(props.api).then(r => {
     departments.value = r.data.data
   })
 
-  close(() => {
-    emit('close')
-  })
+  close(() => closeDialog())
 })
 </script>

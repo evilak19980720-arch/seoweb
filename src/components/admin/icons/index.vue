@@ -1,5 +1,5 @@
 <template>
-  <div class="h-84 pl-2 pr-2">
+  <div class="pl-2 pr-2 h-84">
     <div :class="`grid ${grid} gap-y-4 gap-x-4` + ' mt-3 h-72'">
       <div v-for="icon in icons" :key="icon" class="flex justify-center hover:cursor-pointer" @click="selectIcon(icon)">
         <div v-if="modelValue === icon">
@@ -23,22 +23,19 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-    require: true,
-  },
+defineProps({
   grid: {
     type: String,
-    default: 'grid-cols-4',
-  },
+    default: 'grid-cols-4'
+  }
 })
 
-const emits = defineEmits(['update:modelValue', 'close'])
+const modelValue = defineModel<string>({ type: String, default: '' })
+const emits = defineEmits(['close'])
 
-const limit = ref<number>(16)
+const limit = ref(16)
 const icons = ref<Array<string>>([])
-const total = ref<number>(0)
+const total = ref(0)
 function getIcons(page = 1) {
   const start = (page - 1) * limit.value
   const end = start + limit.value
@@ -49,16 +46,16 @@ onMounted(() => {
   getIcons()
   total.value = constIcons.length
 })
-const handleNext = (value: number) => {
+const handleNext = (value: any) => {
   getIcons(value)
 }
 
-const handlePrev = (value: number) => {
+const handlePrev = (value: any) => {
   getIcons(value)
 }
 const selectIcon = (icon: string) => {
-  emits('update:modelValue', icon)
   emits('close')
+  modelValue.value = icon
 }
 // icons
 const constIcons = [
@@ -353,8 +350,6 @@ const constIcons = [
   'wrench-screwdriver',
   'wrench',
   'x-circle',
-  'x-mark',
+  'x-mark'
 ]
 </script>
-
-<style scoped></style>

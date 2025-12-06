@@ -6,6 +6,7 @@ import { constantRoutes } from '@/router'
 import { RouteRecordRaw } from 'vue-router'
 import { toRaw } from 'vue'
 import { getModuleViewComponents } from '@/router/constantRoutes'
+import { useAppStore } from '@/stores/modules/app'
 
 interface Permissions {
   menus: Menu[]
@@ -15,6 +16,8 @@ interface Permissions {
   permissions: Permission[]
 
   menuPathMap: Map<string, string>
+
+  vertical_active_menu_name: string
 }
 export const usePermissionsStore = defineStore('PermissionsStore', {
   state: (): Permissions => {
@@ -25,7 +28,9 @@ export const usePermissionsStore = defineStore('PermissionsStore', {
 
       permissions: [],
 
-      menuPathMap: new Map()
+      menuPathMap: new Map(),
+
+      vertical_active_menu_name: 'dashboard'
     }
   },
 
@@ -47,6 +52,10 @@ export const usePermissionsStore = defineStore('PermissionsStore', {
 
     getMenuPathMap(): Map<string, string> {
       return this.menuPathMap
+    },
+
+    getVerticalActiveMenuName(): string {
+      return this.vertical_active_menu_name
     }
   },
 
@@ -97,6 +106,17 @@ export const usePermissionsStore = defineStore('PermissionsStore', {
 
       this.setMenus(toRaw(asyncMenus))
 
+      const appStore = useAppStore()
+      // 如果是水平模式，则获取点击菜单的子菜单
+      if (appStore.getVertical) {
+        const len = this.menus.length
+        for (let i = 0; i < len; i++) {
+          if (this.menus[i].name === this.getVerticalActiveMenuName) {
+            // @ts-ignore
+            return this.menus[i].children
+          }
+        }
+      }
       return this.menus
     },
 
@@ -111,6 +131,15 @@ export const usePermissionsStore = defineStore('PermissionsStore', {
 
     setAsyncMenus(menus: Menu[]) {
       this.asyncMenus = menus
+    },
+
+    /**
+     * 设置 vertical 模式的激活菜单
+     *
+     * @param name
+     */
+    setVerticalActiveMenuName(name: string) {
+      this.vertical_active_menu_name = name
     },
 
     /**
@@ -133,11 +162,9 @@ export const usePermissionsStore = defineStore('PermissionsStore', {
           } else {
             importComponent = viewComponents.get(permission.component)
           }
-          // 判断模块是否是默认模块
-          const name = (permission.module === 'default' ? permission.module + '_' : '') + (permission.permission_mark + permission.route.replace('/', '_'))
           const menu: Menu = Object.assign({
             path: this.resolveRoutePathRoutePath(permission.route, path),
-            name,
+            name: permission.module + '_' + permission.permission_mark + permission.route.replace('/', '_'),
             component: importComponent,
             redirect: permission.redirect,
             meta: Object.assign({ title: permission.permission_name, icon: permission.icon, keepalive: permission.keepalive, hidden: permission.hidden, active_menu: permission.active_menu })

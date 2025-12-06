@@ -11,7 +11,7 @@ export function useEnabled() {
   function enabled(path: string, id: string | number, data: object = {}) {
     loading.value = true
     if (!id) {
-       return false
+      return false
     }
     http
       .put(path + '/enable/' + id, data)

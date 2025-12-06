@@ -1,8 +1,10 @@
 <template>
   <el-select v-bind="$attrs" class="w-full" clearable filterable>
-    <el-option-group v-for="group in elOptions" :key="group.label" :label="group.label" v-if="group">
-      <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value" />
-    </el-option-group>
+    <template v-if="group">
+      <el-option-group v-for="group in elOptions" :key="group.label" :label="group.label">
+        <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value" />
+      </el-option-group>
+    </template>
     <el-option v-for="option in elOptions" :key="option.value" :label="option.label" :value="option.value" v-else>
       <slot />
     </el-option>
@@ -16,20 +18,24 @@ import { ref, watch } from 'vue'
 const props = defineProps({
   options: {
     type: Array,
-    default: [],
+    require: false,
+    default: () => {
+      return []
+    }
   },
   api: {
     type: String,
-    default: '',
+    require: false,
+    default: ''
   },
   group: {
     type: Boolean,
-    default: false,
+    default: false
   },
   query: {
     type: Object,
-    default: null,
-  },
+    default: null
+  }
 })
 
 interface Option {
@@ -43,9 +49,11 @@ interface GroupOption {
 }
 
 const getOptions = () => {
-  http.get('options/' + props.api, props.query).then(r => {
-    elOptions.value = r.data.data
-  })
+  if (props.api) {
+    http.get('options/' + props.api, props.query).then(r => {
+      elOptions.value = r.data.data
+    })
+  }
 }
 
 const elOptions: any = props.group ? ref<Array<GroupOption>>() : ref<Array<Option>>()
@@ -60,4 +68,12 @@ if (props.api) {
 } else {
   elOptions.value = props.options
 }
+
+watch(
+  () => props.options,
+  () => {
+    elOptions.value = props.options
+  },
+  { deep: true }
+)
 </script>

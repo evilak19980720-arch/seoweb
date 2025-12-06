@@ -1,69 +1,95 @@
 <template>
-  <div class="bg-gray-50 h-screen flex items-center justify-center">
+  <div class="flex items-center justify-center h-screen bg-gray-50">
     <div class="flex w-full sm:w-[32rem] shadow bg-white lg:rounded-lg">
-      <!--<div class="w-1/2 hidden sm:block">
-              <img src="@/assets/login-left.png" />
+      <!--<div class="hidden w-1/2 sm:block">
+              <img src="@/public/assets/login-left.png" />
             </div>-->
-      <div class="w-full mx-auto pt-6 pb-6 pl-4 pr-4">
+      <div class="w-full pt-6 pb-6 pl-4 pr-4 mx-auto">
         <div class="flex mt-2">
-          <img :src="logo" class="mx-auto w-8" />
+          <img :src="logo" class="w-8 mx-auto" />
         </div>
-        <div class="w-full text-center text-2xl mt-6 mb-8 text-indigo-700">Hi, {{ $t('login.welcome') }}</div>
+        <div class="w-full mt-6 mb-8 text-2xl text-center text-indigo-700">Hi, {{ $t('login.welcome') }}</div>
         <el-divider>{{ $t('login.sign_in') }}</el-divider>
-        <div>
-          <el-form
-            ref="form"
-            :model="params"
-            status-icon
-            v-loading.fullscreen.lock="loading"
-            :rules="rules"
-            element-loading-background="rgba(0, 0, 0, 0.7)"
-            label-width="70px"
-            class="w-11/12 sm:w-4/5 pt-2 space-y-8 mx-auto"
-          >
-            <el-form-item prop="email">
-              <el-input v-model="params.email" type="email" autocomplete="off" :placeholder="$t('login.email')" size="large" :prefix-icon="Message" class="h-12 text-base" />
-            </el-form-item>
-            <el-form-item prop="password">
-              <el-input v-model="params.password" type="password" autocomplete="off" size="large" :placeholder="$t('login.password')" show-password :prefix-icon="Lock" class="h-12 text-base" />
-            </el-form-item>
-          </el-form>
+        <div v-if="loginDriver === 'password'">
+          <passwordLogin />
         </div>
-        <div class="flex justify-between w-11/12 sm:w-4/5 mx-auto mt-3">
-          <el-checkbox v-model="params.remember" class="top-2">
-            {{ $t('login.remember') }}
-          </el-checkbox>
-          <div class="text-sm pt-3 text-indigo-600 cursor-pointer">
-            {{ $t('login.lost_password') }}
+        <div v-if="loginDriver === 'wechat'">
+          <wechatLogin />
+        </div>
+        <div v-if="loginDriver === 'mobile'">
+          <smsLogin />
+        </div>
+        <!-- 登陆方式切换 -->
+        <div class="flex flex-col justify-between w-11/12 mx-auto mt-3 sm:w-4/5" v-if="loginDrivers.length > 1">
+          <el-divider> <span class="text-sm">其 他 登 陆 方 式</span> </el-divider>
+          <div class="flex justify-between w-11/12 mx-auto mt-2 sm:w-3/5">
+            <component v-bind:is="driver.value" v-for="(driver, k) in loginDrivers" :key="k" @click="changeLoginDriver(driver.driver)" />
           </div>
         </div>
-        <div class="w-11/12 sm:w-4/5 mx-auto mt-5">
-          <el-button type="primary" @click="submit(form)" size="large" class="w-full text-xl">
-            {{ $t('login.sign_in') }}
-          </el-button>
-        </div>
-
-        <div class="w-full text-center text-sm text-gray-400 mt-8 mb-10">{{ $t('system.name') }} @copyright 2018-{{ new Date().getFullYear() }}</div>
+        <div class="w-full mt-8 mb-10 text-sm text-center text-gray-400">{{ $t('system.name') }} @copyright 2018-{{ new Date().getFullYear() }}</div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Lock, Message } from '@element-plus/icons-vue'
-import { onMounted } from 'vue'
-import { useLogin } from './login'
-import logo from '@/assets/logo.png'
-
-const { params, loading, submit, form, rules } = useLogin()
-
+import { onMounted, shallowReactive, ref, watch } from 'vue'
+import logo from '@/public/assets/logo.png'
+import passwordLogin from './components/passwordLogin.vue'
+import wechatLogin from './components/wechatLogin.vue'
+import smsLogin from './components/smsLogin.vue'
+import emailIcon from './icons/email.vue'
+import mobileIcon from './icons/mobile.vue'
+import wechatIcon from './icons/wechat.vue'
+import { useAppStore } from '@/stores/modules/app'
 // set default color-theme light
 onMounted(() => {
   document.querySelector('html')?.setAttribute('class', 'light')
 })
+
+const getLoginDriverFromStorage = () => {
+  const driver = sessionStorage.getItem('login_driver')
+  return driver || 'password'
+}
+
+const changeLoginDriver = (driver: string) => {
+  sessionStorage.setItem('login_driver', driver)
+  loginDriver.value = driver
+}
+const loginDriver = ref<string>(getLoginDriverFromStorage())
+
+const loginDrivers = shallowReactive([
+  {
+    label: '密码登录',
+    value: emailIcon,
+    driver: 'password'
+  }
+])
+
+const appStore = useAppStore()
+watch(
+  () => appStore.setting,
+  () => {
+    if (appStore.setting.login?.mobile) {
+      loginDrivers.push({
+        label: '手机登陆',
+        value: mobileIcon,
+        driver: 'mobile'
+      })
+    }
+    if (appStore.setting.login?.wechat) {
+      loginDrivers.push({
+        label: '微信登陆',
+        value: wechatIcon,
+        driver: 'wechat'
+      })
+    }
+  },
+  { deep: true }
+)
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 :deep(.el-form-item__content) {
   margin-left: 0 !important;
 }
@@ -72,3 +98,4 @@ onMounted(() => {
   @apply text-xl text-slate-400;
 }
 </style>
+./components/login

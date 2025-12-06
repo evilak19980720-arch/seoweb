@@ -1,9 +1,9 @@
+import Message from '@/support/message'
 import Request from '@/support/request'
 import { ref, watch } from 'vue'
-import Message from '@/support/message'
 
+const http = new Request()
 export function useExcelDownload() {
-  const http = new Request()
   const isSuccess = ref(false)
   const loading = ref<boolean>(false)
   const afterDownload = ref()
@@ -12,8 +12,9 @@ export function useExcelDownload() {
     http
       .setResponseType('blob')
       .init()
-      .get(path + '/export', data)
-      .then(r => {
+      .setTimeout(999999999)
+      .get(path, data)
+      .then((r: any) => {
         if (r.headers['content-type'] === 'application/json') {
           const blob = new Blob([r.data], { type: r.headers['content-type'] })
           const blobReader = new Response(blob).json()

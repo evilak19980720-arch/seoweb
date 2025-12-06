@@ -1,10 +1,16 @@
 <template>
-  <div>
+  <div class="relative">
     <Editor :api-key="aipKey" :init="config" v-model="content" v-bind="$attrs" />
+    <el-button :class="uploadButtonClass" @click="openDialog()"><Icon name="cloud-arrow-up" class="mr-1" />选择附件</el-button>
+    <!-- Dialog -->
+    <Dialog v-model="attachVisible" width="1200px" title="选择附件" append-to-body :z-index="999999">
+      <Attachment :multi="multiAttach" @close-dialog="closeDialog" v-model="attachments" />
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import Attachment from '@/views/system/systemAttachments/index.vue'
 import '@/public/tinymce/tinymce.min'
 import '@/public/tinymce/themes/silver/theme.min'
 import '@/public/tinymce/icons/default/icons.min'
@@ -37,22 +43,18 @@ import '@/public/tinymce/plugins/lists/plugin.min'
 import '@/public/tinymce/plugins/wordcount/plugin.min'
 import '@/public/tinymce/plugins/autosave/plugin.min'
 import '@/public/tinymce/plugins/emoticons/plugin.min'
-
 // lang
-import '@/public/tinymce/langs/zh-CN'
+import '@/public/tinymce/langs/zh-Hans'
 
 import Editor from '@tinymce/tinymce-vue'
-import { env, warpHost } from '@/support/helper'
+import { getBaseUrl, getFileExt, getFilename, warpHost } from '@/support/helper'
 import Http from '@/support/http'
 import Message from '@/support/message'
 import { ref, watch } from 'vue'
+import { IMAGE_EXTENSIONS } from '@/composables/useUpload'
 
+const attachVisible = ref<boolean>(false)
 const props = defineProps({
-  modelValue: {
-    type: String,
-    default: '',
-    require: true
-  },
   width: {
     type: [Number, String],
     required: false,
@@ -75,16 +77,14 @@ const props = defineProps({
 
   plugins: {
     type: String,
-    default:
-      'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code ' +
-      'codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount autosave emoticons'
+    default: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code ' + 'codesample table charmap'
   },
   toolbar: {
-    type: Array,
+    type: Array<string>,
     default: [
       'undo redo restoredraft cut copy paste pastetext forecolor backcolor bold italic underline strikethrough link anchor alignleft aligncenter alignright alignjustify outdent indent bullist numlist blockquote subscript superscript removeformat styleselect formatselect fontselect fontsizeselect ' +
-        'table upload image axupimgs media emoticons charmap hr pagebreak insertdatetime  ' +
-        'selectall visualblocks searchreplace code print preview indent2em fullscreen'
+        'table upload image axupimgs media emoticons charmap hr pagebreak insertdatetime ' +
+        'codesample selectall visualblocks searchreplace code print preview indent2em fullscreen'
     ]
   }
 })
@@ -97,10 +97,14 @@ const uploaded = (blobInfo: any, progress: any) =>
     } else {
       const params = new FormData()
       params.append('image', blobInfo.blob())
-      Http.post(env('VITE_BASE_URL') + '/upload/image', params)
+      const baseUrl = getBaseUrl()
+      // 如果有是以 / 结尾，则直接拼接 'upload/image'
+      // 如果没有以 / 结尾，则拼接 /upload/image
+      const url = baseUrl.endsWith('/') ? baseUrl + 'upload/image' : baseUrl + '/upload/image'
+      Http.post(url, params)
         .then(res => {
           if (res.data.code === 10000) {
-            resolve(res.data.data.path)
+            resolve(warpHost(res.data.data.path))
           } else {
             Message.error(res.data.message)
           }
@@ -110,6 +114,13 @@ const uploaded = (blobInfo: any, progress: any) =>
         })
     }
   })
+
+const multiAttach = ref(true)
+const uploadButtonClassWhenFullscreen: string = 'fixed right-2 top-2 z-[999999]'
+const uploadButtonClassWhenNotFullscreen: string = 'absolute right-2 top-2 z-[999999]'
+const uploadButtonClass = ref<string>(uploadButtonClassWhenNotFullscreen)
+const tinymce = ref()
+const attachments = ref<Array<string>>([])
 const config = {
   base_url: '@/public/tinymce',
   language: props.language,
@@ -120,23 +131,72 @@ const config = {
   toolbar: props.toolbar,
   branding: false,
   // menubar: false,
-  images_upload_handler: uploaded
+  images_upload_handler: uploaded,
+  setup(editor: any) {
+    tinymce.value = editor
+    editor.on('FullscreenStateChanged', (e: any) => {
+      // _this.fullscreen = e.state
+      uploadButtonClass.value = e.state ? uploadButtonClassWhenFullscreen : uploadButtonClassWhenNotFullscreen
+    })
+  },
+  // pick file callback 选择文件
+  file_picker_callback: function (callback: any, value: any, meta: any) {
+    const input = document.createElement('input')
+    input.setAttribute('type', 'file')
+    input.setAttribute('accept', meta.filetype === 'media' ? 'video/*' : 'image/*')
+    input.addEventListener('change', event => {
+      const reader = new FileReader()
+      const fileInput = event.target as HTMLInputElement
+      if (fileInput.files && fileInput.files.length > 0) {
+        const file = fileInput.files[0]
+        reader.onload = function () {
+          // 构造表单数据
+          const formData = new FormData()
+          formData.append('image', file)
+
+          Http.post('/upload/image', formData)
+            .then(r => {
+              callback(warpHost(r.data.data.path))
+            })
+            .catch(e => {
+              console.error('上传视频报错', e)
+            })
+        }
+        reader.readAsDataURL(file)
+      }
+    })
+    input.click()
+  }
 }
-
-const emits = defineEmits(['update:modelValue'])
-const content = ref(props.modelValue)
+const content = defineModel()
 // 创建的时候
-watch(content, value => {
-  emits('update:modelValue', value)
-})
-
-// 回显监听
 watch(
-  () => props.modelValue,
+  () => content.value,
   value => {
     content.value = value
   }
 )
+
+// 关闭
+const closeDialog = () => {
+  let html = ''
+  attachments.value.forEach(attachment => {
+    if (IMAGE_EXTENSIONS.indexOf(getFileExt(attachment)) > -1) {
+      html += `<img src="${attachment}"/>`
+    } else {
+      const filename = getFilename(attachment)
+      html += `<p><a href="${attachment}">${filename}</a></p> `
+    }
+  })
+  tinymce.value.insertContent(html)
+  attachments.value = []
+  attachVisible.value = false
+}
+
+// 开启
+const openDialog = () => {
+  attachVisible.value = true
+}
 </script>
 
 <style scoped>
@@ -151,7 +211,7 @@ watch(
 }
 
 .tox {
-  z-index: 9999 !important;
+  z-index: 999999999999 !important;
 }
 
 .tox-promotion {

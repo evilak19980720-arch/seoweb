@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full sm:w-[28rem] min-h-[30rem] bg-white">
+  <div class="bg-white dark:bg-regal-dark w-full sm:w-[22rem] min-h-[30rem]">
     <el-tree :data="departments" :props="{ label: 'department_name', value: 'id' }" @node-click="clickDepartment" class="p-5" :expand-on-click-node="false" :highlight-current="true" />
   </div>
 </template>
@@ -7,7 +7,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import http from '@/support/http'
-
 defineProps({
   modelValue: {
     type: Number,
@@ -32,7 +31,7 @@ const clickDepartment = (node: any) => {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 :deep(.el-tree .el-tree-node) {
   @apply p-0.5;
 }

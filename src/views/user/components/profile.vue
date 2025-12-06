@@ -30,16 +30,7 @@
     >
       <el-input v-model="profile.email" placeholder="请填写邮箱" />
     </el-form-item>
-    <el-form-item
-      label="密码"
-      prop="password"
-      :rules="[
-        {
-          pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/,
-          message: '必须包含大小写字母和数字的组合，可以使用特殊字符，长度在6-20之间'
-        }
-      ]"
-    >
+    <el-form-item label="密码" prop="password">
       <el-input v-model="profile.password" type="password" show-password placeholder="请输入密码" />
     </el-form-item>
     <div class="flex justify-center">
@@ -49,26 +40,27 @@
 </template>
 
 <script lang="ts" setup>
+// @ts-nocheck
 import { onMounted, ref } from 'vue'
 import { useCreate } from '@/composables/curd/useCreate'
 import http from '@/support/http'
-import { Code } from '@/enum/app'
-import Message from '@/support/message'
 import { useUserStore } from '@/stores/modules/user'
 
-interface profile {
+interface profileInterface {
   avatar: string
   username: string
   email: string
   password: string
 }
 
-const profile = ref<profile>({
-  avatar: '',
-  username: '',
-  email: '',
-  password: ''
-})
+const profile = ref<profileInterface>(
+  Object.assign({
+    avatar: '',
+    username: '',
+    email: '',
+    password: ''
+  })
+)
 const { form, loading, submitForm, afterCreate } = useCreate('user/online', null, profile)
 
 const getUserInfo = () => {
@@ -86,12 +78,13 @@ onMounted(() => {
 })
 
 const userStore = useUserStore()
+
 afterCreate.value = () => {
   userStore.getUserInfo()
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 :deep(.el-upload) {
   @apply h-full w-full;
 }

@@ -2,9 +2,9 @@
   <div @contextmenu.prevent="handleContextMenu" class="flex gap-x-2">
     <slot></slot>
     <!-- 右击菜单 -->
-    <div v-if="showMenu" class="absolute z-[999999] bg-white dark:bg-regal-dark shadow-xl rounded border border-gray-200" :style="{ top: `${position.y}px`, left: `${position.x}px` }">
+    <div v-if="showMenu" class="absolute z-[99999] bg-white dark:bg-regal-dark shadow-xl rounded border border-gray-200" :style="{ top: `${position.y}px`, left: `${position.x}px` }">
       <ul class="w-20 py-1 text-center">
-        <li v-for="(item, index) in menuItems" :key="index" @click="item.action()" class="hover:bg-gray-50 px-2 py-1 hover:cursor-pointer text-[12px]">
+        <li v-for="(item, index) in menuItems" :key="index" @click="item.action()" class="hover:bg-gray-50 hover:dark:bg-gray-800 px-2 py-1 hover:cursor-pointer text-[12px]">
           {{ item.label }}
         </li>
       </ul>
@@ -55,7 +55,6 @@ const handleContextMenu = (event: MouseEvent) => {
   event.preventDefault()
   position.x = event.clientX
   position.y = event.clientY
-  console.log(position)
   showMenu.value = true
 }
 
@@ -69,13 +68,3 @@ onUnmounted(() => {
   window.removeEventListener('click', handleClickOutside)
 })
 </script>
-
-<style>
-.context-menu {
-  position: absolute;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-}
-</style>

@@ -1,7 +1,6 @@
 import '@/styles/index.scss'
 
-import CatchAdmin from '@/support/catchAdmin'
+import CatchAdmin from './support/catchAdmin'
 
 const admin = new CatchAdmin()
-
 admin.bootstrap()

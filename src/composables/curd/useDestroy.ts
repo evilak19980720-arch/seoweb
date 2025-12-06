@@ -10,15 +10,14 @@ export function useDestroy(confirm: string = '确认删除吗') {
   const beforeDestroy = ref()
 
   // fetch list
-  function destroy(path: string, id: string | number) {
+  function destroy(path: string, id: string | number, isForce: boolean = false) {
     Message.confirm(confirm + '?', function () {
       // before destroy
       if (isFunction(beforeDestroy.value)) {
         beforeDestroy.value()
       }
-
       http
-        .delete(path + '/' + id)
+        .delete(path + '/' + id + (isForce ? '?trashed=1' : ''))
         .then(r => {
           if (r.data.code === Code.SUCCESS) {
             Message.success(r.data.message)

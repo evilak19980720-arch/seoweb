@@ -10,7 +10,8 @@
           :key="item.value"
           :value="item.value"
           name="type"
-          >{{ item.label }}
+        >
+          {{ item.label }}
         </el-radio-button>
       </el-radio-group>
     </el-form-item>
@@ -20,23 +21,11 @@
       :rules="[
         {
           required: true,
-          message: '模块名称必须填写'
-        },
-        {
-          validator: (rule: any, value: any, callback: any) => {
-            if (!/^[A-Za-z]+$/.test(value)) {
-              callback('模块名称只允许大小字母组合')
-            } else {
-              callback()
-            }
-          },
-          trigger: 'blur'
+          message: '请选择模块'
         }
       ]"
     >
-      <el-select v-model="formData.title" placeholder="选择安装模块">
-        <el-option v-for="item in modules" :key="item.value" :label="item.label" :value="item.value" />
-      </el-select>
+      <Select api="modulesInstall" v-model="formData.title" />
     </el-form-item>
     <el-form-item label="上传 ZIP" prop="file" v-if="formData.type === 2">
       <Upload action="module/upload" :limit="1" accept=".zip" :on-success="moduleUpload">
@@ -55,7 +44,6 @@
 <script lang="ts" setup>
 // @ts-nocheck
 import { useCreate } from '@/composables/curd/useCreate'
-
 import { onMounted } from 'vue'
 import { Code } from '@/enum/app'
 import Message from '@/support/message'
@@ -69,26 +57,11 @@ onMounted(() => {
   close(() => emit('close'))
 })
 
-const moduleUpload = (response: any) => {
+const moduleUpload = (response, uploadFile) => {
   if (response.code === Code.SUCCESS) {
     formData.value.file = response.data
   } else {
     Message.error(response.message)
   }
 }
-
-const modules = [
-  {
-    label: '权限管理',
-    value: 'permissions'
-  },
-  {
-    label: '内容管理',
-    value: 'cms'
-  },
-  {
-    label: '系统管理',
-    value: 'system'
-  }
-]
 </script>

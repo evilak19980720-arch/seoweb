@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 interface Prop {
-  content?: string
+  content?: any
   length: number
 }
 

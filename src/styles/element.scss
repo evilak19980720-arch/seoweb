@@ -3,22 +3,22 @@
   $colors:
     (
       'primary': (
-        'base': #4f46e5,
+        'base': #4f46e5
       ),
       'success': (
-        'base': #059669,
+        'base': #059669
       ),
       'warning': (
-        'base': #fbbf24,
+        'base': #fbbf24
       ),
       'danger': (
-        'base': #f43f5e,
+        'base': #f43f5e
       ),
       'error': (
-        'base': #f43f5e,
+        'base': #f43f5e
       ),
       'info': (
-        'base': #909399,
+        'base': #909399
       )
     ),
   $input: ('border-radius': 8px)
@@ -47,15 +47,21 @@
 }
 
 .el-pagination {
-    button {
-        border-radius: var(--el-page-border-radius) !important;
+  button {
+    border-radius: var(--el-page-border-radius) !important;
+  }
+  .el-pager {
+    .number {
+      border-radius: var(--el-page-border-radius) !important;
     }
-    .el-pager {
-        .number {
-            border-radius: var(--el-page-border-radius) !important;
-        }
-        .more {
-            border-radius: var(--el-page-border-radius) !important;
-        }
+    .more {
+      border-radius: var(--el-page-border-radius) !important;
     }
+  }
+}
+.is-message-box {
+  z-index: 10000000 !important;
+}
+.el-message {
+  z-index: 10000001 !important;
 }

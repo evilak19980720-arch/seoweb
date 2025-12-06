@@ -1,10 +1,11 @@
 import { Code } from '@/enum/app'
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import { getAuthToken, getBaseUrl, removeAuthToken } from './helper'
+import { getAuthToken, getBaseUrl, isUndefined, removeAuthToken } from './helper'
 import Message from './message'
 import router from '@/router'
 import ResponseData from '@/types/responseData'
-
+import { isRef, unref } from 'vue'
+import { useAppStore } from '@/stores/modules/app'
 type responseType = 'arraybuffer' | 'document' | 'json' | 'text' | 'stream' | 'blob'
 
 /**
@@ -80,6 +81,9 @@ class Request {
    */
   public post(path: string, data: object = {}) {
     this.init()
+    if (isRef(data)) {
+      data = unref(data) as Object
+    }
     return this.request.post(this.baseURL + path, data)
   }
 
@@ -91,6 +95,9 @@ class Request {
    */
   public put(path: string, data: object = {}) {
     this.init()
+    if (isRef(data)) {
+      data = unref(data) as Object
+    }
     return this.request.put(this.baseURL + path, data)
   }
 
@@ -136,7 +143,7 @@ class Request {
    * @returns
    */
   public setHeader(key: string, value: string): Request {
-    this.headers.key = value
+    this.headers[key] = value
 
     return this
   }
@@ -199,18 +206,20 @@ class Request {
         if (response.request.responseType === 'blob') {
           return response
         }
-
+        // json response
         const r: ResponseData = response.data
         const code = r.code
         const message = r.message
+        // success response
         if (code === 1e4) {
           return response
         }
+
         if (code === 10004) {
           Message.error(message || 'Error')
         } else if (code === Code.LOST_LOGIN || code === Code.LOGIN_EXPIRED) {
           // to re-login
-          Message.confirm('登录已失效，需要重新登陆', function () {
+          Message.confirm(message + '，需要重新登陆', function () {
             removeAuthToken()
             router.push('/login')
           })
@@ -225,8 +234,40 @@ class Request {
         return Promise.reject(new Error(message || 'Error'))
       },
       error => {
-        Message.error(error.message)
-        return Promise.reject(error)
+        if (!isUndefined(error.response)) {
+          // 打印数据
+          if (typeof error.response.data === 'string') {
+            // 异常抽屉展示
+            const appStore = useAppStore()
+            appStore.setIsExceptionShow(
+              true,
+              {
+                message: '',
+                trace: []
+              },
+              error.response.data
+            )
+          } else {
+            const trace = error.response.data.trace
+            // 如果没有 trace 堆栈信息
+            if (trace instanceof Array || error.response.data?.startsWith('<script>')) {
+              // 异常抽屉展示
+              const appStore = useAppStore()
+              appStore.setIsExceptionShow(
+                true,
+                {
+                  message: error.response.data.message,
+                  trace: trace instanceof Array ? trace : []
+                },
+                trace instanceof Array ? '' : error.response.data
+              )
+            }
+            Message.error(error.response.data?.message || 'Internal Server Error')
+          }
+        } else {
+          Message.error('服务异常: ' + error.message)
+        }
+        return Promise.reject('服务异常: ' + error)
       }
     )
   }

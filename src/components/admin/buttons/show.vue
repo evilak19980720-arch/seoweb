@@ -1,16 +1,25 @@
 <template>
-  <el-button type="primary" :size="size"><Icon name="eye" className="w-4 h-4 mr-1" /> {{ text }}</el-button>
+  <el-button type="primary" :size="size" text>
+    <Icon :name="icon" className="w-4 h-4 mr-1" />
+    {{ text }}
+  </el-button>
 </template>
 
 <script lang="ts" setup>
+import { t } from '@/support/helper'
+
 defineProps({
   size: {
     type: String,
-    default: 'small',
+    default: 'small'
+  },
+  icon: {
+    type: String,
+    default: 'eye'
   },
   text: {
     type: String,
-    default: '详情',
-  },
+    default: t('system.show')
+  }
 })
 </script>

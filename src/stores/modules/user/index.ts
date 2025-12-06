@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
+import { User } from '@/types/User'
 import http from '@/support/http'
-import { rememberAuthToken, removeAuthToken } from '@/support/helper'
+import { rememberAuthToken, removeAuthToken, randomString, isUndefined } from '@/support/helper'
 import Message from '@/support/message'
 import router from '@/router'
-import { User } from '@/types/User'
 import { Permission } from '@/types/Permission'
+import { usePermissionsStore } from './permissions'
+import { MenuType } from '@/enum/app'
 
 export const useUserStore = defineStore('UserStore', {
   state: (): User => {
@@ -25,7 +27,7 @@ export const useUserStore = defineStore('UserStore', {
 
       roles: [] as string[],
 
-      from: ''
+      actions: []
     }
   },
 
@@ -48,8 +50,9 @@ export const useUserStore = defineStore('UserStore', {
     getPermissions(): Permission[] | undefined {
       return this.permissions
     },
-    getFrom(): string | undefined {
-      return this.from
+
+    getActions(): Array<String> | undefined {
+      return this.actions
     }
   },
 
@@ -89,10 +92,16 @@ export const useUserStore = defineStore('UserStore', {
       this.status = status
     },
 
-    setFrom(form: string) {
-      this.from = form
+    setActions(permissions: Permission[]) {
+      const actions: Array<String> = []
+      permissions?.forEach(permission => {
+        if (permission.type === MenuType.Button_Type) {
+          const a: string = permission.module + '.' + permission.permission_mark.replace('@', '.')
+          actions.push(a.toLowerCase())
+        }
+      })
+      this.actions = actions
     },
-
     /**
      * login
      *
@@ -100,9 +109,18 @@ export const useUserStore = defineStore('UserStore', {
      * @returns
      */
     login(params: Object) {
+      // 解构参数，防止影响到登录输入框
+      const data = { ...params }
+      const random = randomString()
+      // @ts-ignore
+      if (!isUndefined(data.password)) {
+        // @ts-ignore
+        data.password = btoa(random + data.password)
+      }
       return new Promise<void>((resolve, reject) => {
         http
-          .post('/login', params)
+          .setHeader('Request-Auth', random)
+          .post('/login', data)
           .then(response => {
             const { token } = response.data.data
             rememberAuthToken(token)
@@ -124,7 +142,9 @@ export const useUserStore = defineStore('UserStore', {
         .then(() => {
           removeAuthToken()
           this.$reset()
-          router.push({ path: '/login' })
+          const permissionsStore = usePermissionsStore()
+          permissionsStore.$reset()
+          router.push({ name: 'login' })
         })
         .catch(e => {
           Message.error(e.message)
@@ -138,8 +158,8 @@ export const useUserStore = defineStore('UserStore', {
       return new Promise((resolve, reject) => {
         http
           .get('/user/online')
-          .then((response: any) => {
-            const { id, username, email, avatar, permissions, roles, rememberToken, status, from } = response.data.data
+          .then(response => {
+            const { id, username, email, avatar, permissions, roles, rememberToken, status } = response.data.data
             // set user info
             this.setId(id)
             this.setUsername(username)
@@ -149,7 +169,7 @@ export const useUserStore = defineStore('UserStore', {
             this.setStatus(status)
             this.setAvatar(avatar)
             this.setPermissions(permissions)
-            this.setFrom(from)
+            this.setActions(permissions)
             resolve(response.data.data)
           })
           .catch(e => {

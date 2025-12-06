@@ -1,15 +1,17 @@
 import { useUserStore } from '@/stores/modules/user'
-import { getAuthToken, removeAuthToken, setPageTitle } from '@/support/helper'
+import { getAuthToken, removeAuthToken, setPageTitle, getLoginPath } from '@/support/helper'
 import progress from '@/support/progress'
 import { WhiteListPage } from '@/enum/app'
 import { Router, RouteRecordRaw } from 'vue-router'
 import { usePermissionsStore } from '@/stores/modules/user/permissions'
 import { Menu } from '@/types/Menu'
 import { toRaw } from 'vue'
+import Message from '@/support/message'
+
 const guard = (router: Router) => {
   // white list
-  const whiteList: string[] = [WhiteListPage.LOGIN_PATH, WhiteListPage.NOT_FOUND_PATH]
-
+  const loginPath = getLoginPath()
+  const whiteList: string[] = [loginPath, '/404']
   router.beforeEach(async (to, from, next) => {
     // set page title
     setPageTitle(to.meta.title as unknown as string)
@@ -20,7 +22,7 @@ const guard = (router: Router) => {
     // 如果 token 存在
     if (authToken) {
       // 如果进入 /login 页面，重定向到首页
-      if (to.path === WhiteListPage.LOGIN_PATH) {
+      if (to.path === loginPath) {
         next({ path: '/' })
       } else {
         const userStore = useUserStore()
@@ -45,12 +47,12 @@ const guard = (router: Router) => {
                 path: '/:pathMatch(.*)*',
                 redirect: '/404'
               })
-              // router.addRoute(generateRoutes())
             }
             next({ ...to, replace: true })
           } catch (e) {
+            Message.error('Vue Route 导航异常: ' + (e as Error).message)
             removeAuthToken()
-            next({ path: `${WhiteListPage.LOGIN_PATH}?redirect=/${to.path}` })
+            next({ path: `${loginPath}?redirect=/${to.path}` })
           }
         }
       }
@@ -60,7 +62,7 @@ const guard = (router: Router) => {
       if (whiteList.indexOf(to.path) !== -1) {
         next()
       } else {
-        next({ path: WhiteListPage.LOGIN_PATH })
+        next({ path: loginPath })
       }
       progress.done()
     }

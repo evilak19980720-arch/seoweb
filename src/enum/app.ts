@@ -11,7 +11,7 @@ export const enum Code {
   LOGIN_EXPIRED = 10006, // 登录失效
   LOGIN_BLACKLIST = 10007, // 黑名单
   USER_FORBIDDEN = 10008, // 账户被禁
-  WECHAT_RESPONSE_ERROR = 40000,
+  WECHAT_RESPONSE_ERROR = 40000
 }
 
 /**
@@ -19,7 +19,7 @@ export const enum Code {
  */
 export const enum Status {
   ENABLE = 1,
-  DISABLE = 2,
+  DISABLE = 2
 }
 
 /**
@@ -30,7 +30,7 @@ export const enum Status {
 export const enum WhiteListPage {
   LOGIN_PATH = '/login',
 
-  NOT_FOUND_PATH = '/404',
+  NOT_FOUND_PATH = '/404'
 }
 
 /**
@@ -39,5 +39,5 @@ export const enum WhiteListPage {
 export const enum MenuType {
   TOP_TYPE = 1,
   PAGE_TYPE = 2,
-  Button_Type = 3,
+  Button_Type = 3
 }

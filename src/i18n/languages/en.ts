@@ -1,6 +1,6 @@
 const en = {
   system: {
-    name: 'CatchAdmin Dashboard',
+    name: 'Dashboard',
     chinese: 'Chinese',
     english: 'English',
     confirm: 'Confirm',
@@ -11,9 +11,11 @@ const en = {
     yes: 'Y',
     no: 'N',
     add: 'Add',
+    destroy: 'Destroy',
     finish: 'Finish',
     back: 'Back',
-    update: 'Update',
+    show: 'Show',
+    update: 'Edit',
     search: 'Search',
     reset: 'Reset'
   },
@@ -78,6 +80,7 @@ const en = {
         form_label: 'Form Label',
         form_component: 'Component',
         list: 'List',
+        render: 'Render Where',
         form: 'Form',
         unique: 'Unique',
         search: 'Search',

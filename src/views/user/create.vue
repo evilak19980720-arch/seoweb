@@ -12,7 +12,7 @@
             }
           ]"
         >
-          <el-input v-model="formData.username" placeholder="请填写昵称" />
+          <el-input v-model="formData.username" placeholder="请填写昵称" show-word-limit maxlength="20" />
         </el-form-item>
         <el-form-item
           label="邮箱"
@@ -21,19 +21,20 @@
             {
               required: true,
               message: '邮箱必须填写'
-            },
-            {
-              type: 'email',
-              message: '邮箱格式不正确'
             }
           ]"
         >
-          <el-input v-model="formData.email" placeholder="请填写邮箱" />
+          <el-input v-model="formData.email" placeholder="请填写邮箱" show-word-limit maxlength="100" />
+        </el-form-item>
+        <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="formData.mobile" placeholder="请填写手机号" show-word-limit maxlength="20" />
         </el-form-item>
         <el-form-item label="密码" prop="password" :rules="passwordRules">
           <el-input v-model="formData.password" type="password" show-password placeholder="请输入密码" />
         </el-form-item>
+      </div>
 
+      <div class="w-1/2" v-if="hasRoles">
         <el-form-item label="角色" prop="roles" v-if="hasRoles" :rules="[{ required: true, message: '请选择角色' }]">
           <el-tree-select
             v-model="formData.roles"
@@ -48,14 +49,11 @@
             show-checkbox
           />
         </el-form-item>
-      </div>
-
-      <div class="w-1/2" v-if="hasRoles">
         <el-form-item label="部门" prop="department_id">
-          <el-tree-select v-model="formData.department_id" :data="departments" check-strictly :props="{ label: 'department_name', value: 'id' }" />
+          <el-tree-select class="w-full" v-model="formData.department_id" :data="departments" check-strictly :props="{ label: 'department_name', value: 'id' }" />
         </el-form-item>
         <el-form-item label="岗位" prop="department_id">
-          <el-select v-model="formData.jobs" multiple>
+          <el-select class="w-full" v-model="formData.jobs" multiple>
             <el-option v-for="item in jobs" :key="item.id" :label="item.job_name" :value="item.id" />
           </el-select>
         </el-form-item>
@@ -72,7 +70,7 @@
 import { useCreate } from '@/composables/curd/useCreate'
 import { useShow } from '@/composables/curd/useShow'
 
-import { onMounted, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import http from '@/support/http'
 
 const props = defineProps({
@@ -105,9 +103,7 @@ if (props.primary) {
   useShow(props.api, props.primary, formData)
 }
 
-const emit = defineEmits(['close'])
-close(() => emit('close'))
-
+const closeDialog = inject('closeDialog')
 const departments = ref()
 const jobs = ref()
 const roles = ref()
@@ -126,5 +122,6 @@ onMounted(() => {
       roles.value = r.data.data
     })
   }
+  close(() => closeDialog())
 })
 </script>

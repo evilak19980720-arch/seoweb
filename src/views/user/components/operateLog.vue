@@ -9,11 +9,11 @@
     <el-table :data="tableData" class="mt-3" v-loading="loading">
       <el-table-column prop="creator" label="创建人" />
       <el-table-column prop="module" label="模块" />
-      <el-table-column prop="action" label="操作" width="150" />
-      <el-table-column prop="http_method" label="请求方法" width="90" />
-      <el-table-column prop="http_code" label="请求状态" width="90">
+      <el-table-column prop="action" label="操作" />
+      <el-table-column prop="http_method" label="请求方法" />
+      <el-table-column prop="http_code" label="请求状态">
         <template #default="scope">
-          <el-tag type="success" v-if="scope.row.http_code >= 200 && scope.row.http_code < 300"> {{ scope.row.http_code }}</el-tag>
+          <el-tag type="success" v-if="scope.row.http_code >= 200 && scope.row.http_code < 300">{{ scope.row.http_code }}</el-tag>
           <el-tag type="danger" v-else>{{ scope.row.http_code }}</el-tag>
         </template>
       </el-table-column>
@@ -32,7 +32,6 @@
 
 <script lang="ts" setup>
 // @ts-nocheck
-
 import { computed, onMounted } from 'vue'
 import { useGetList } from '@/composables/curd/useGetList'
 

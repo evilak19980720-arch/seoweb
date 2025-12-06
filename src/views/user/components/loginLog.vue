@@ -31,5 +31,3 @@ onMounted(() => search())
 
 const tableData = computed(() => data.value?.data)
 </script>
-
-<style scoped></style>

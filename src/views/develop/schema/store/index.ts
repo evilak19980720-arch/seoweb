@@ -56,13 +56,13 @@ export const useSchemaStore = defineStore('schemaStore', {
         created_at: true,
         creator_id: true,
         updated_at: true,
-        deleted_at: true,
+        deleted_at: true
       }),
       // structures
       structures: [] as Structure[],
 
       // is finished
-      is_finished: false,
+      is_finished: false
     }
   },
 
@@ -78,7 +78,7 @@ export const useSchemaStore = defineStore('schemaStore', {
 
     getFinished(): boolean {
       return this.is_finished
-    },
+    }
   },
 
   // store actions
@@ -124,7 +124,7 @@ export const useSchemaStore = defineStore('schemaStore', {
         nullable: false,
         unique: false,
         default: '',
-        comment: '',
+        comment: ''
       })
     },
 
@@ -141,6 +141,6 @@ export const useSchemaStore = defineStore('schemaStore', {
      */
     start(): void {
       this.is_finished = false
-    },
-  },
+    }
+  }
 })

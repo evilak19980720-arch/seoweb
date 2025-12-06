@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="data?.columns" class="mt-3" v-loading="loading">
+  <el-table :data="data?.columns" class="mt-3" v-loading="loading" max-height="850">
     <el-table-column prop="name" label="字段名称" />
     <el-table-column prop="type" label="类型" />
     <el-table-column prop="nullable" label="nullable">

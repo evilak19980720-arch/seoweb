@@ -1,75 +1,79 @@
 <template>
   <div>
-    <Search :search="search" :reset="reset">
-      <template v-slot:body>
-        <el-form-item label="模块名称">
-          <el-input v-model="query.title" name="title" clearable />
-        </el-form-item>
+    <catch-table
+      :columns="[
+        {
+          prop: 'title',
+          label: '模块名称'
+        },
+        {
+          prop: 'path',
+          label: '模块目录'
+        },
+        {
+          slot: 'version',
+          label: '模块版本'
+        },
+        {
+          slot: 'status',
+          label: '模块状态'
+        },
+        {
+          type: 'operate',
+          label: '操作',
+          width: 300,
+          destroy: false
+        }
+      ]"
+      :search-form="[
+        {
+          type: 'input',
+          name: 'title',
+          label: '模块名称'
+        }
+      ]"
+      :api="api"
+      primary-name="name"
+      :pagination="false"
+      ref="catchtable"
+    >
+      <template #version="scope">
+        <el-tag type="warning">{{ scope.row.version }}</el-tag>
       </template>
-    </Search>
-    <div class="table-default">
-      <Operate :show="open">
-        <template v-slot:operate>
-          <!-- header 插槽的内容放这里 -->
-          <el-button type="success" class="float-right" @click="installVisible = true"><Icon name="cog-6-tooth" class="w-4 h-4 mr-1" /> 安装</el-button>
-        </template>
-      </Operate>
-      <el-table :data="tableData" class="mt-3" v-loading="loading">
-        <el-table-column prop="title" label="模块名称" width="180" />
-        <el-table-column prop="path" label="模块目录" width="180" />
-        <el-table-column prop="version" label="模块版本">
-          <template #default="scope">
-            <el-tag type="warning">{{ scope.row.version }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="enable" label="模块状态">
-          <template #default="scope">
-            <Status v-model="scope.row.enable" :id="scope.row.name" :api="api" />
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="300">
-          <template #default="scope">
-            <Update @click="open(scope.row.name)" />
-            <Destroy @click="destroy(api, scope.row.name)" />
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-    <Dialog v-model="visible" :title="title" destroy-on-close>
-      <Create @close="close(reset)" :primary="id" :api="api" />
-    </Dialog>
+      <template #status="scope">
+        <Status v-model="scope.row.enable" :id="scope.row.name" :api="api" @refresh="refresh" />
+      </template>
+      <template #operation>
+        <!-- header 插槽的内容放这里 -->
+        <el-button type="success" class="float-right" @click="installVisible = true">
+          <Icon name="cog-6-tooth" class="w-4 h-4 mr-1" />
+          安装
+        </el-button>
+      </template>
 
+      <template #dialog="row">
+        <Create :primary="row?.name" :api="api" />
+      </template>
+    </catch-table>
     <!-- 安装 -->
     <Dialog v-model="installVisible" title="安装模块" destroy-on-close>
-      <Install @close="closeInstall" />
+      <Install />
     </Dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 // @ts-nocheck
-import { computed, onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import Create from './create.vue'
 import Install from './install.vue'
-import { useGetList } from '@/composables/curd/useGetList'
-import { useDestroy } from '@/composables/curd/useDestroy'
-import { useOpen } from '@/composables/curd/useOpen'
-
 const api = 'module'
+const catchtable = ref()
 
-const { data, query, search, reset, loading } = useGetList(api)
-const { destroy, deleted } = useDestroy('确认删除吗? ⚠️将会删除模块下所有文件')
-const { open, close, title, visible, id } = useOpen()
+// '确认删除吗? ⚠️将会删除模块下所有文件'
 
-const tableData = computed(() => data.value?.data)
 const installVisible = ref<boolean>(false)
-const closeInstall = () => {
-  installVisible.value = false
+const refresh = () => {
+  catchtable.value.reset()
 }
-
-onMounted(() => {
-  search()
-
-  deleted(reset)
-})
 </script>

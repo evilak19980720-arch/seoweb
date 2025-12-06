@@ -1,11 +1,9 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import type { App } from 'vue'
+import { isProd, getLoginPath, loadModuleRoute } from '@/support/helper'
 // module routers
-import { getModuleViewComponents } from './constantRoutes'
-import { isGenerate, isProd } from '@/support/helper'
+// import { getModuleViewComponents } from './constantRoutes'
 
-// const userStore = useUserStore()
-getModuleViewComponents()
 const notInProdRoute = () => {
   if (isProd()) {
     return [] as RouteRecordRaw[]
@@ -13,83 +11,77 @@ const notInProdRoute = () => {
     return [
       {
         path: '/develop',
+        name: 'develop',
         component: () => import('@/layout/index.vue'),
-        meta: { title: '开发工具', icon: 'wrench-screwdriver', hidden: !isGenerate() },
+        meta: { title: '开发工具', icon: 'wrench-screwdriver' },
         children: [
           {
             path: 'modules',
             name: 'modules',
-            meta: {
-              title: '模块管理',
-              keepalive: 0
-            },
+            meta: { title: '模块管理', keepalive: false },
             component: () => import('@/views/develop/module/index.vue')
           },
           {
             path: 'schemas',
             name: 'schemas',
-            meta: {
-              title: 'Schema',
-              keepalive: 0
-            },
+            meta: { title: 'Schemas', keepalive: false },
             component: () => import('@/views/develop/schema/index.vue')
+          },
+          {
+            path: 'schema/create',
+            name: 'schema_create',
+            meta: { title: 'Schema 创建', hidden: true, active_menu: '/develop/schemas', keepalive: false },
+            component: () => import('@/views/develop/schema/createWithSteps.vue')
           },
           {
             path: 'generate/:schema',
             name: 'generate',
-            meta: { title: '代码生成', hidden: true, active_menu: '/develop/schemas', keepalive: 0 },
+            meta: { title: '代码生成', hidden: true, active_menu: '/develop/schemas', keepalive: false },
             component: () => import('@/views/develop/generate/index.vue')
           }
         ]
       },
-      {
-        path: '/develop',
-        component: () => import('@/layout/index.vue'),
-        meta: { title: '开发工具', icon: 'wrench-screwdriver', hidden: isGenerate(), keepalive: 0 },
-        children: [
-          {
-            path: 'generates',
-            name: 'generates',
-            meta: {
-              title: '生成代码',
-              keepalive: 1
-            },
-            component: () => import('@/views/develop/generator/index.vue')
-          }
-        ]
-      }
-    ]
+      // 自定义静态路由菜单
+    ] as RouteRecordRaw[]
   }
 }
-// @ts-ignore
-// .concat(moduleRoutes)
+// 动态加载模版
+// getModuleViewComponents()
 export const constantRoutes: RouteRecordRaw[] = [
   {
     path: '/dashboard',
-    meta: { title: 'Dashboard', icon: 'home' },
+    name: 'dashboard',
+    meta: { title: 'DashBoard', icon: 'home' },
     component: () => import('@/layout/index.vue'),
     children: [
       {
-        path: '',
-        name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'home', hidden: false, keepalive: 1 },
-        component: () => import('@/views/dashboard/index.vue')
+        path: 'basic',
+        name: 'basic',
+        meta: { title: '基础', hidden: false, keepalive: false },
+        component: () => import('@/views/dashboard/server/index.vue')
+      },
+      {
+        path: 'sales',
+        name: 'sales',
+        meta: { title: '销量', hidden: false, keepalive: false },
+        component: () => import('@/views/dashboard/sales/index.vue')
       }
     ]
   }
-].concat(notInProdRoute() as any)
+].concat(notInProdRoute() as any).concat(loadModuleRoute() as any)
+
 // default routes, it will not change to menus
 const defaultRoutes: RouteRecordRaw[] = [
   {
     path: '/',
     name: '/',
     component: () => import('@/layout/index.vue'),
-    redirect: '/dashboard',
+    redirect: '/dashboard/basic',
     children: [
       {
         path: '/404',
         name: '404',
-        meta: { title: '404', keepalive: 1 },
+        meta: { title: '404', keepalive: false },
         component: () => import('@/components/404/index.vue')
       }
     ]
@@ -100,22 +92,34 @@ const defaultRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: 'center',
-        name: 'users-center',
-        meta: { title: '个人中心', keepalive: 1 },
+        name: 'user-center',
+        meta: { title: '个人中心', keepalive: false },
         component: () => import('@/views/user/center.vue')
       }
     ]
   },
   {
-    path: '/login',
+    path: '/system',
+    component: () => import('@/layout/index.vue'),
+    children: [
+      {
+        path: 'setting',
+        name: 'system-setting',
+        meta: { title: '系统设置', keepalive: false },
+        component: () => import('@/views/system/basic/index.vue')
+      }
+    ]
+  },
+  {
+    path: getLoginPath(),
     name: 'login',
-    meta: { title: '登录' },
+    meta: { title: '登录', keepalive: false },
     component: () => import('@/views/login/index.vue')
   }
 ]
 
 const routes = constantRoutes.concat(defaultRoutes)
-console.log(routes)
+
 const router = createRouter({
   history: createWebHashHistory(),
   routes,

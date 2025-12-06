@@ -12,30 +12,35 @@
     <slot />
   </el-menu>
 </template>
-<script lang="ts" setup>
+<script lang="ts" setup name="menus">
 import { useAppStore } from '@/stores/modules/app'
 import { watch } from 'vue'
 import router from '@/router'
 import { useNavTabStore } from '@/stores/modules/tabs'
 
-const appStore = useAppStore()
 const navTabStore = useNavTabStore()
-watch(() => router.currentRoute, (to, from) => {
+watch(
+  () => router.currentRoute,
+  (to, from) => {
     const tab: any = {
-        name: to.value.name,
-        fullPath: to.value.fullPath,
-        path: to.value.path,
-        is_active: true,
-        meta: {
-            title: to.value.meta.title,
-            affix: false,
-        }
+      name: to.value.name,
+      fullPath: to.value.fullPath,
+      path: to.value.path,
+      is_active: true,
+      meta: {
+        title: to.value.meta.title,
+        affix: false,
+        keepalive: !!to.value.meta.keepalive
+      }
     }
     navTabStore.addTabs(tab)
-}, {deep:true, immediate:true})
+  },
+  { deep: true, immediate: true }
+)
+const appStore = useAppStore()
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .el-menu {
   border-right: none;
 }
@@ -74,6 +79,6 @@ watch(() => router.currentRoute, (to, from) => {
 }
 
 :deep(.el-menu-item) {
-  height: 50px !important;
+  height: 56px !important;
 }
 </style>

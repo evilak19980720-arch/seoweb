@@ -6,28 +6,44 @@
 -->
 <template>
   <div>
-    <div v-if="searchFields.length > 0 && showSearch" class="flex flex-wrap gap-5 pt-5 pb-5 pl-5 pr-5 bg-white dark:bg-regal-dark">
-      <csearch :fields="searchFields" @search="doSearch" @reset="reset" ref="csearchRef" />
+    <div v-if="searchFields.length > 0 && showSearch" class="flex flex-wrap gap-5 pt-5 pr-5 pb-5 pl-5 bg-white dark:bg-regal-dark">
+      <csearch :fields="searchFields" @search="doSearch" @reset="reset" ref="csearchRef" :loading="loading" />
       <slot name="csearch" />
     </div>
-    <div class="pb-5 pl-5 pr-5 mt-3 bg-white dark:bg-regal-dark" :style="{ height: height }" ref="catch-table">
+    <slot name="middle" />
+    <div class="pr-5 pb-5 pl-5 mt-3 bg-white dark:bg-regal-dark" :style="{ height: height }" ref="catch-table">
       <!-- 表格头部 -->
-      <div class="h-16 pt-5">
+      <div class="pt-5 h-16" v-if="showHeader">
         <!-- 多选 -->
         <div v-if="multiSelectIds.length > 0" class="flex justify-between">
           <div class="flex pt-2 text-sm text-slate-400"><Icon name="check" class="mr-2" /> 已选 {{ multiSelectIds.length }} 条数据</div>
           <div class="flex gap-2">
             <!--批量操作的插槽-->
             <slot name="multiOperate" />
-            <el-button @click="destroy(props.api, multiSelectIds.join(','))" type="danger" plain size="small"> <Icon name="trash" className="w-4 h-4 mr-1" />删除 </el-button>
+            <!-- 批量恢复 -->
+            <el-button v-if="isHasTrash()" @click="restore(props.api, multiSelectIds.join(','))" type="success" plain size="small">
+              <Icon name="arrow-uturn-left" className="w-4 h-4 mr-1" /> 恢复
+            </el-button>
+            <!-- 批量删除 -->
+            <el-button v-if="multiDelShow" @click="destroy(props.api, multiSelectIds.join(','), isHasTrash() ? true : false)" type="danger" plain size="small">
+              <Icon name="trash" className="w-4 h-4 mr-1" />删除
+            </el-button>
           </div>
         </div>
         <!-- 正常头部 -->
         <div class="flex flex-row justify-between" v-else>
-          <div>
-            <Add @click="openDialog" v-if="operation" />
-            <el-button @click="download(exportUrl ? exportUrl : api)" v-if="exports">导出</el-button>
-            <!-- 头部插槽 -->
+          <div class="flex gap-x-2">
+            <!-- 新增 -->
+            <Add @click="openDialog" v-if="operation" v-action="permissionAction('store')" />
+            <!-- 回收站 -->
+            <el-button v-if="trash" @click="getTrash" type="success"> <Icon name="trash" className="w-4 h-4 mr-1" /> 回收站</el-button>
+            <!-- 导出 -->
+            <Export :api="api" :exportUrl="exportUrl" v-action="permissionAction('export')" :query="queryStore.getTableQuery" v-if="exports" />
+            <!-- 导入 -->
+            <Import :action="importUrl" v-if="importUrl" v-action="permissionAction('import')" @afterImport="reset()" />
+            <!-- 动态左侧操作插槽 -->
+            <Action v-if="action?.operation" :action="action?.operation" :scope="null" />
+            <!-- 左侧操作插槽 -->
             <slot name="operation" />
           </div>
           <!---表头 tools-->
@@ -41,7 +57,7 @@
               <el-dropdown size="small" @command="setTableSize">
                 <el-icon><More /></el-icon>
                 <template #dropdown>
-                  <el-dropdown-menu class="w-20 mt-2">
+                  <el-dropdown-menu class="mt-2 w-20">
                     <el-dropdown-item command="large" v-if="tableSize === 'large'">宽松</el-dropdown-item>
                     <el-dropdown-item command="large" v-else>宽松</el-dropdown-item>
                     <el-dropdown-item command="default" divided>默认</el-dropdown-item>
@@ -106,7 +122,11 @@
               :min-width="column['min-width']"
               :align="column.align"
               :fixed="column.fixed"
-            />
+            >
+              <template #default="scope" v-if="column.slot">
+                <slot :name="column.slot" v-bind="scope" />
+              </template>
+            </el-table-column>
             <!--- type === index -->
             <el-table-column
               v-if="column.show && column.type === 'index'"
@@ -117,7 +137,7 @@
               :width="column.width"
               :min-width="column['min-width']"
               :align="column.align"
-              :index="index"
+              :index="column.index"
               :fixed="column.fixed"
             />
             <!--- type === operate -->
@@ -131,9 +151,12 @@
               :fixed="column.fixed"
             >
               <template #default="scope">
+                <Action v-if="action?.prepend" :action="action?.prepend" :scope="scope" />
                 <slot name="_operate" v-bind="scope" />
-                <Update v-if="column.update" @click="openDialog(scope.row)" />
-                <Destroy v-if="column.destroy" @click="destroy(api as string, scope.row[primaryName])" />
+                <Update v-if="column.update && !isHasTrash()" @click="openDialog(scope.row)" v-action="permissionAction('update')" />
+                <Restore v-if="isHasTrash() && trash" @click="restore(api, scope.row[primaryName])" v-action="permissionAction('restore')" />
+                <Destroy v-if="column.destroy" @click="destroy(api, scope.row[primaryName], isHasTrash() ? true : false)" v-action="permissionAction('destroy')" />
+                <Action v-if="action?.append" :action="action?.append" :scope="scope" />
                 <slot name="operate" v-bind="scope" />
               </template>
             </el-table-column>
@@ -168,7 +191,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed, onMounted, provide } from 'vue'
+// @ts-nocheck
+import { reactive, ref, computed, onMounted, provide, watch, nextTick } from 'vue'
 import tcolumns from './tcolumns.vue'
 // import ctcolumns from './ctcolumns'
 import { Column, SItem } from './ctable'
@@ -176,9 +200,10 @@ import csearch from './csearch.vue'
 import { isBoolean } from '@/support/helper'
 import useSearch from './useSearch'
 import { useDestroy } from '@/composables/curd/useDestroy'
+import { useRestore } from '@/composables/curd/useRestore'
 import { More, RefreshRight } from '@element-plus/icons-vue'
-import { useExcelDownload } from '@/composables/curd/useExcelDownload'
-
+import { useQueryStore } from './useQueryStore'
+import Action from './components/tableAction/index.vue'
 // define props
 const props = defineProps({
   // 请求接口
@@ -311,11 +336,6 @@ const props = defineProps({
     type: String,
     default: '确定删除吗'
   },
-  // 权限标识
-  permissionMark: {
-    type: String,
-    default: ''
-  },
   dialogWidth: {
     type: String,
     default: ''
@@ -332,11 +352,54 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  importUrl: {
+    type: String,
+    default: ''
+  },
   searchable: {
     type: Boolean,
     default: true
+  },
+  // 回收站配置
+  trash: {
+    type: Boolean,
+    default: false
+  },
+  // 批量删除是否展示
+  multiDelShow: {
+    type: Boolean,
+    default: true
+  },
+  defaultMultiSelection: {
+    type: Array<String | Number>,
+    default: []
+  },
+  showHeader: {
+    type: Boolean,
+    default: true
+  },
+  // 动态插槽，专门提供给 APi 使用
+  action: {
+    type: Object,
+    default: () => ({})
+  },
+  // 权限前缀，使用模块+控制器
+  permission: {
+    type: [String, null],
+    default: () => {
+      return null
+    }
   }
 })
+
+// table 对象
+const catchtable = ref()
+const row = ref()
+// search 对象
+const csearchRef = ref()
+// 搜索
+const searchFields = ref<Array<any>>(props.searchForm)
+const queryStore = useQueryStore()
 
 // 显示分页
 const showPaginate = () => {
@@ -347,24 +410,19 @@ const showPaginate = () => {
   return props.pagination
 }
 
-// 获取默认参数
-const getDefulatParams = () => {
-  return props.defaultParams
-}
-
-const row = ref()
-// search 对象
-const csearchRef = ref()
-// 搜索
-const searchFields = ref<Array<any>>(props.searchForm)
 // eslint-disable-next-line vue/no-dupe-keys
-const { limit, page, total, changeLimit, searchParams, changePage, doSearch, reset, loading, data, getTableData } = useSearch(props.api, showPaginate(), props.limit, props.page, getDefulatParams())
+const { limit, page, total, changeLimit, changePage, doSearch, reset, loading, data, getTableData } = useSearch(props.api, showPaginate(), props.limit, props.page)
+
+// init query
+queryStore.initQuery(showPaginate() ? { page, limit } : {})
+
 // 多选 ID
 const multiSelectIds = ref<Array<string | number>>([])
 // 获取 table data
 const tableData = computed(() => data.value?.data)
 // 表格 columns
 const tableColumns = ref<Array<Column>>([])
+
 // 初始化 columns
 const initColumns = () => {
   props.columns.forEach(c => {
@@ -380,8 +438,6 @@ const initColumns = () => {
   })
 }
 
-// excel 导出
-const { download } = useExcelDownload()
 // 排序
 const customSortChange = (column: any, prop: string, order: string) => {
   if (props.sortChange) {
@@ -392,7 +448,8 @@ const customSortChange = (column: any, prop: string, order: string) => {
     if (column.order === 'ascending') {
       sort = 'asc'
     }
-    searchParams.value = Object.assign(searchParams.value, { sortField: column.prop, order: sort })
+    queryStore.setMerge({ sortField: column.prop, order: sort })
+    // searchParams.value = Object.assign(searchParams.value, { sortField: column.prop, order: sort })
     // 排序之后重新请求
     getTableData()
   }
@@ -406,11 +463,16 @@ const openDialog = (v = null, dialogTitle: string = '') => {
 
   visible.value = true
   // @ts-ignore
-  title.value = dialogTitle || (v?.id ? '更新' : '创建')
+  title.value = dialogTitle || (v?.id ? '更新' : '新增')
 }
-const closeDialog = () => {
+
+const closeDialog = (isReset: boolean = true) => {
   visible.value = false
-  reset()
+  if (isReset) {
+    reset()
+  } else {
+    doSearch()
+  }
 }
 // 批量选择
 const multiSelect = (rows: Array<any>) => {
@@ -437,32 +499,82 @@ const { destroy, deleted } = useDestroy(props.destroyConfirm)
 onMounted(() => {
   deleted(reset)
 })
-
+// 恢复
+const { restore, restored } = useRestore()
+// onMounted
+onMounted(() => {
+  restored(reset)
+  setDefaultParams(props.defaultParams)
+  getTableData()
+})
 // 页面初始化
 initColumns()
-getTableData()
 
+// action 字符串
+const permissionAction = (action: string) => {
+  return props.permission ? props.permission + '.' + action : null
+}
 // 暴露外部的 delete
 const del = (api: string, id: any) => {
   destroy(api, id)
-  reset()
+  deleted(reset)
 }
 
 // 设置默认搜索参数
 const setDefaultParams = (params: Object) => {
-  searchParams.value = Object.assign(searchParams.value, params)
-  searchParams.value = Object.assign(searchParams.value, getDefulatParams())
+  queryStore.setMerge(params)
+  queryStore.setDefaults(params)
+  // searchParams.value = Object.assign(searchParams.value, params)
+  // searchParams.value = Object.assign(searchParams.value, getDefaultParams())
 }
 
+// 回收站列表
+const getTrash = () => {
+  queryStore.setMerge({
+    trashed: 1
+  })
+  doSearch()
+}
+
+const isHasTrash = () => {
+  return queryStore.getTrashed
+  // const defaultParams = searchParams.value
+  // @ts-ignore
+  // return !!defaultParams.trashed
+}
+
+const getTableQuery = () => {
+  return queryStore.getTableQuery
+}
 // 曝露方法
-defineExpose({ doSearch, openDialog, del, closeDialog, reset, setDefaultParams, getMultiSelectIds })
+defineExpose({ doSearch, openDialog, del, closeDialog, reset, setDefaultParams, getMultiSelectIds, getTableQuery })
 // 注入
-provide('closeDialog', () => {
-  closeDialog()
+provide('closeDialog', (isReset: boolean = false) => {
+  closeDialog(isReset)
 })
 provide('refresh', () => {
   doSearch()
 })
+
+// 自动选中
+watch(
+  () => data.value,
+  newValue => {
+    if (props.defaultMultiSelection.length > 0) {
+      nextTick(() => {
+        const data = newValue?.data as Array<any>
+        data.forEach((item: any) => {
+          if (props.defaultMultiSelection.indexOf(item.id) > -1) {
+            catchtable.value.toggleRowSelection(item, true)
+          }
+        })
+      })
+    }
+  },
+  {
+    deep: true
+  }
+)
 </script>
 <style scoped scss>
 :deep(.tools .el-button) {

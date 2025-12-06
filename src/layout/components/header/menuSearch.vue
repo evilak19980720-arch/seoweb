@@ -1,10 +1,10 @@
 <template>
-  <div class="w-10 h-10 grid place-items-center rounded-full mt-2 hover:cursor-pointer">
+  <div class="hidden w-10 h-10 mt-2 rounded-full outline-none sm:grid place-items-center hover:cursor-pointer">
     <div class="flex flex-row w-96">
       <Icon name="magnifying-glass" class="hidden sm:block" @click="searchMenuVisiable = true" />
 
       <Teleport to="body">
-        <el-dialog v-model="searchMenuVisiable" width="30%" draggable>
+        <el-dialog v-model="searchMenuVisiable" width="30%" draggable class="rounded">
           <el-cascader :filterable="true" :options="options" @change="toWhere" placeholder="请输入菜单名称" clearable class="w-full" :show-all-levels="false" />
         </el-dialog>
       </Teleport>

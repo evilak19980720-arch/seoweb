@@ -5,7 +5,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, watch, inject } from 'vue'
 import Schema from './steps/schema.vue'
 import Structure from './steps/structure.vue'
 import { useSchemaStore } from './store'
@@ -24,13 +24,13 @@ const prev = () => {
   }
 }
 
-const emit = defineEmits(['close'])
+const closeDialog = inject('closeDialog') as Function
 watch(
   () => schemaStore.getFinished,
   function (value) {
     if (value) {
-      emit('close')
+      closeDialog()
     }
-  },
+  }
 )
 </script>

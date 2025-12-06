@@ -49,7 +49,7 @@
 import { useCreate } from '@/composables/curd/useCreate'
 import { useShow } from '@/composables/curd/useShow'
 
-import { onMounted } from 'vue'
+import { onMounted, inject } from 'vue'
 
 const props = defineProps({
   primary: [String, Number],
@@ -57,7 +57,7 @@ const props = defineProps({
 })
 
 const { formData, form, loading, submitForm, close } = useCreate(
-  props.api as string,
+  props.api,
   props.primary,
   Object.assign({
     title: '',
@@ -73,13 +73,13 @@ const { formData, form, loading, submitForm, close } = useCreate(
   })
 )
 
-const emit = defineEmits(['close'])
+const closeDialog = inject('closeDialog')
 
 if (props.primary) {
-  useShow(props.api as string, props.primary, formData)
+  useShow(props.api, props.primary, formData)
 }
 
 onMounted(() => {
-  close(() => emit('close'))
+  close(() => closeDialog())
 })
 </script>

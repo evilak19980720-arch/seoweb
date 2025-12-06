@@ -1,10 +1,11 @@
 <script lang="ts">
-import { h, defineComponent, VNode, toRaw } from 'vue'
+import { h, defineComponent, VNode, watch, ref } from 'vue'
 import { usePermissionsStore } from '@/stores/modules/user/permissions'
 import MenuItem from './item.vue'
 import menus from './menus.vue'
 import { useUserStore } from '@/stores/modules/user'
 import { Menu } from '@/types/Menu'
+import { useAppStore } from '@/stores/modules/app'
 
 /**
  * 递归渲染 Menu 节点
@@ -52,8 +53,6 @@ function filterMenus(menus: Menu[] | undefined): Menu[] {
       return false
     }
 
-    newMenus.push(m)
-    /**
     if (isHasOnlyChild(m) && m.children?.length) {
       newMenus.push(
         Object.assign({
@@ -64,7 +63,7 @@ function filterMenus(menus: Menu[] | undefined): Menu[] {
       )
     } else {
       newMenus.push(m)
-    }*/
+    }
   })
 
   return newMenus
@@ -105,11 +104,29 @@ export default defineComponent({
   setup(props, ctx) {
     const permissionsStore = usePermissionsStore()
     const userStore = useUserStore()
-
+    const appStore = useAppStore()
     // 后端的 permissions 返回 undefined，则认为该后端无权限系统
     const permissions = userStore.getPermissions === undefined ? [] : userStore.getPermissions
 
-    const vnodes = getVNodes(filterMenus(permissionsStore.getMenusFrom(permissions, true)), props.subMenuClass)
+    // 初始化菜单节点
+    const vnodes = ref(getVNodes(filterMenus(permissionsStore.getMenusFrom(permissions, true)), props.subMenuClass))
+    
+    // 监听双栏模式状态和激活菜单变化
+    watch(
+      () => [permissionsStore.getVerticalActiveMenuName, appStore.getVertical],
+      () => {
+        // 双栏模式下，菜单已经在 getMenusFrom 中被过滤
+        vnodes.value = getVNodes(filterMenus(permissionsStore.getMenusFrom(permissions, true)), props.subMenuClass)
+      }
+    )
+    /**
+    watch(
+      () => appStore.getVertical,
+      () => {
+        permissionsStore.setVerticalActiveMenuName('dashboard')
+        vnodes.value = getVNodes(filterMenus(permissionsStore.getMenusFrom(permissions, true)), props.subMenuClass)
+      }
+    ) */
     return () => {
       return h(
         menus,
@@ -117,7 +134,7 @@ export default defineComponent({
           class: 'border-none side-menu ' + props.menuClass
         },
         {
-          default: () => vnodes
+          default: () => vnodes.value
         }
       )
     }

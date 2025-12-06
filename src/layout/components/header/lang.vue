@@ -1,7 +1,7 @@
 <template>
-  <div class="w-10 h-10 grid place-items-center rounded-full mt-2 hover:cursor-pointer">
-    <div class="flex hover:cursor-pointer pl-1 pr-1">
-      <el-dropdown size="large" class="flex items-center justify-center hover:cursor-pointer w-full" @command="selectLanguage">
+  <div class="grid w-10 h-10 mt-2 rounded-full place-items-center hover:cursor-pointer">
+    <div class="flex pl-1 pr-1 hover:cursor-pointer">
+      <el-dropdown size="large" class="flex items-center justify-center w-full hover:cursor-pointer" @command="selectLanguage">
         <Icon name="language" />
         <template #dropdown>
           <el-dropdown-menu>
@@ -21,7 +21,7 @@ import { useAppStore } from '@/stores/modules/app'
 
 const langs = reactive([
   { label: 'chinese', value: 'zh' },
-  { label: 'english', value: 'en' },
+  { label: 'english', value: 'en' }
 ])
 
 const appStore = useAppStore()

@@ -13,12 +13,12 @@ interface tab {
 }
 
 const defaultTab: tab = {
-  name: 'Dashboard',
-  fullPath: '/dashboard',
-  path: '/dashboard',
+  name: 'basic',
+  fullPath: '/dashboard/basic',
+  path: '/dashboard/basic',
   is_active: true,
   meta: {
-    title: 'Dashboard',
+    title: '基础',
     affix: true
   }
 }
@@ -45,7 +45,8 @@ export const useNavTabStore = defineStore('nav_tabs', {
 
       let isExist = false
 
-      this.tabs.map(t => {
+      // eslint-disable-next-line array-callback-return
+      this.tabs.map((t: tab): void => {
         if (t.name === Tab.name) {
           isExist = true
           t.is_active = true
@@ -70,6 +71,7 @@ export const useNavTabStore = defineStore('nav_tabs', {
     },
 
     selectTab(tab: tab): void {
+      // eslint-disable-next-line array-callback-return
       this.tabs.map(t => {
         if (t.name === tab.name) {
           t.is_active = true
@@ -116,7 +118,7 @@ export const useNavTabStore = defineStore('nav_tabs', {
     // 关闭所有
     removeAllTabs() {
       this.tabs = [defaultTab]
-      router.push('/dashboard')
+      router.replace({ path: '/dashboard/basic' })
     },
     // 关闭其他
     removeOtherTabs() {

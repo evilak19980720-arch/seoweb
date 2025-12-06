@@ -1,16 +1,25 @@
 <template>
-  <el-button type="danger" :size="size"><Icon name="trash" className="w-4 h-4 mr-1" /> {{ text }}</el-button>
+  <el-button type="danger" :size="size" text>
+    <Icon :name="icon" className="w-4 h-4 mr-1" />
+    {{ text }}
+  </el-button>
 </template>
 
 <script lang="ts" setup>
+import { t } from '@/support/helper'
+
 defineProps({
   size: {
     type: String,
-    default: 'small',
+    default: 'small'
+  },
+  icon: {
+    type: String,
+    default: 'trash'
   },
   text: {
     type: String,
-    default: '删除',
-  },
+    default: t('system.destroy')
+  }
 })
 </script>

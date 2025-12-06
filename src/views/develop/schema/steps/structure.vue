@@ -1,7 +1,7 @@
 <template>
   <div>
     <VueDraggable v-model="structures" target=".el-table__body tbody" :animation="150" @end="onEnd">
-      <el-table :data="structures" class="draggable">
+      <el-table :data="structures" class="draggable" :lazy="false" max-height="700">
         <el-table-column prop="field" :label="$t('generate.schema.structure.field_name.name')" />
         <el-table-column prop="type" :label="$t('generate.schema.structure.type.name')">
           <template #default="scope">
@@ -33,21 +33,21 @@
       <el-button class="mt-5" type="primary" @click="next">{{ $t('system.confirm') }}</el-button>
     </div>
 
-    <Dialog v-model="visible" :title="$t('system.add')">
+    <Dialog v-model="visible" :title="$t('system.add')" width="600px">
       <el-form :model="structure" status-icon label-width="120px" ref="form">
-        <el-form-item
-          :label="$t('generate.schema.structure.field_name.name')"
-          prop="field"
-          :rules="[
-            {
-              required: true,
-              message: $t('generate.schema.structure.field_name.verify')
-            }
-          ]"
-        >
-          <el-input v-model="structure.field" />
-        </el-form-item>
-        <div class="flex justify-between">
+        <div class="grid justify-between grid-cols-2">
+          <el-form-item
+            :label="$t('generate.schema.structure.field_name.name')"
+            prop="field"
+            :rules="[
+              {
+                required: true,
+                message: $t('generate.schema.structure.field_name.verify')
+              }
+            ]"
+          >
+            <el-input v-model="structure.field" />
+          </el-form-item>
           <el-form-item
             class="w-full"
             :label="$t('generate.schema.structure.type.name')"
@@ -64,23 +64,24 @@
             </el-select>
           </el-form-item>
         </div>
-        <el-form-item :label="$t('generate.schema.structure.length')" prop="length">
-          <el-input-number v-model="structure.length" :min="0" />
-        </el-form-item>
-        <div class="flex justify-between">
-          <el-form-item label="nullable" prop="nullable">
+        <div class="grid grid-cols-2">
+          <el-form-item :label="$t('generate.schema.structure.length')" prop="length">
+            <el-input-number v-model="structure.length" :min="0" />
+          </el-form-item>
+          <el-form-item label="是否为空" prop="nullable">
             <el-switch v-model="structure.nullable" inline-prompt :active-text="$t('system.yes')" :inactive-text="$t('system.no')" />
           </el-form-item>
           <el-form-item :label="$t('generate.schema.structure.default')" prop="default" v-if="!structure.nullable">
             <el-input v-model="structure.default" />
           </el-form-item>
+          <el-form-item :label="$t('generate.schema.structure.unique')" prop="unique">
+            <el-switch v-model="structure.unique" inline-prompt :active-text="$t('system.yes')" :inactive-text="$t('system.no')" />
+          </el-form-item>
         </div>
-        <el-form-item :label="$t('generate.schema.structure.unique')" prop="unique">
-          <el-switch v-model="structure.unique" inline-prompt :active-text="$t('system.yes')" :inactive-text="$t('system.no')" />
-        </el-form-item>
         <el-form-item :label="$t('generate.schema.structure.comment')" prop="comment">
-          <el-input v-model="structure.comment" text />
+          <el-input v-model="structure.comment" :rows="2" type="textarea" placeholder="表注释" />
         </el-form-item>
+        <!-- 关联关系 -->
         <div class="flex justify-end">
           <el-button type="primary" @click="submitStructure(form)">{{ $t('system.confirm') }}</el-button>
         </div>
@@ -89,7 +90,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { Ref, ref } from 'vue'
+import { Ref, ref, watch } from 'vue'
 import { useSchemaStore, Structure } from '../store'
 import { Delete, Plus, Edit } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
@@ -101,19 +102,40 @@ import { VueDraggable } from 'vue-draggable-plus'
 const schemaStore = useSchemaStore()
 const emits = defineEmits(['prev', 'next'])
 const visible = ref(false)
-
 // 初始化
 const structures = ref(schemaStore.getStructures)
 
 const structure: Ref<Structure> = ref(schemaStore.initStructure())
+// 更新
+const isUpdate = ref(false)
 // structure
 const addField = async () => {
+  isUpdate.value = false
   await form.value?.clearValidate()
   visible.value = true
 }
+
+// 如果关闭了弹窗，重置表单的值
+watch(
+  () => visible.value,
+  (val: boolean) => {
+    if (!val) {
+      structure.value = schemaStore.initStructure()
+    }
+  }
+)
+
+watch(
+  () => schemaStore.getStructures,
+  () => {
+    structures.value = schemaStore.getStructures
+  }
+)
+
 const updateField = (id: number) => {
   visible.value = true
-  schemaStore.getStructures.forEach(s => {
+  isUpdate.value = true
+  structures.value.forEach(s => {
     if (s.id === id) {
       structure.value = s
     }
@@ -124,17 +146,40 @@ const updateField = (id: number) => {
 const form = ref<FormInstance>()
 const submitStructure = (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  formEl.validate((valid: any):any => {
+  formEl.validate(valid => {
     if (valid) {
-      visible.value = !visible.value
-      schemaStore.addStructure(structure.value)
-      structure.value = schemaStore.initStructure()
-    } else {
-      return false
+      if (isExistField(structure.value.field, isUpdate.value ? structure.value.id : 0)) {
+        Message.error(`${structure.value.field} 已存在，请修改字段名称`)
+      } else {
+        visible.value = !visible.value
+        schemaStore.addStructure(structure.value)
+        structure.value = schemaStore.initStructure()
+      }
     }
   })
 }
 
+/**
+ * 是否 field 存在
+ *
+ * @param field
+ * @param id
+ */
+const isExistField = (field: string, id: number = 0) => {
+  const fields: Array<string> = []
+  structures.value.forEach((structure: Structure) => {
+    if (id > 0) {
+      if (structure.id !== id) {
+        fields.push(structure.field)
+      }
+    } else {
+      fields.push(structure.field)
+    }
+  })
+
+  return fields.indexOf(field) !== -1
+}
+// 删除字段
 const deleteField = (id: number) => {
   structures.value = structures.value.filter((s: Structure) => {
     return !(s.id === id)
@@ -154,6 +199,7 @@ const next = () => {
     })
   }
 }
+
 // 调整数据结构
 const onEnd = () => {
   schemaStore.setStructures(structures.value)

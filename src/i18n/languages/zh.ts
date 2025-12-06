@@ -1,6 +1,6 @@
 const zh = {
   system: {
-    name: 'CatchAdmin 管理系统',
+    name: '后台管理系统',
     chinese: '中文',
     english: '英文',
     confirm: '确定',
@@ -13,8 +13,10 @@ const zh = {
     add: '新增',
     edit: '编辑',
     finish: '完成',
+    destroy: '删除',
+    show: '详情',
     back: '返回',
-    update: '更新',
+    update: '编辑',
     search: '搜索',
     reset: '重置'
   },
@@ -69,23 +71,24 @@ const zh = {
           name: '字段名称',
           verify: '请填写字段名称'
         },
-        length: '长度',
+        length: '字段长度',
         type: {
-          name: '类型',
+          name: '字段类型',
           placeholder: '选择字段类型',
           verify: '请先选择字段类型'
         },
         form_label: '表单 Label',
         form_component: '表单组件',
+        render: '渲染位置',
         list: '列表',
         form: '表单',
-        unique: '唯一',
+        unique: '是否唯一',
         search: '查询',
         search_op: {
           name: '搜索操作符',
           placeholder: '选择搜索操作符'
         },
-        nullable: 'nullable',
+        nullable: '是否为空',
         default: '默认值',
         rules: {
           name: '验证规则',
@@ -98,7 +101,7 @@ const zh = {
     code: {
       title: '生成代码',
       module: {
-        name: '所属模块',
+        name: '模块',
         placeholder: '请选择模块',
         verify: '请选择模块'
       },

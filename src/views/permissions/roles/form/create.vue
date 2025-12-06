@@ -22,7 +22,7 @@
         }
       ]"
     >
-      <el-input v-model="formData.role_name" name="role_name" clearable />
+      <el-input v-model="formData.role_name" name="role_name" clearable show-word-limit maxlength="20" />
     </el-form-item>
     <el-form-item
       label="角色标识"
@@ -34,11 +34,11 @@
         }
       ]"
     >
-      <el-input v-model="formData.identify" name="identify" clearable />
+      <el-input v-model="formData.identify" name="identify" clearable show-word-limit maxlength="30" />
     </el-form-item>
 
     <el-form-item label="角色描述" prop="description">
-      <el-input v-model="formData.description" name="description" clearable type="textarea" />
+      <el-input v-model="formData.description" name="description" clearable type="textarea" show-word-limit maxlength="200" />
     </el-form-item>
     <el-form-item label="数据权限" prop="data_range">
       <Select v-model="formData.data_range" name="data_range" clearable api="dataRange" class="w-full" />
@@ -86,41 +86,18 @@
     </div>
   </el-form>
 </template>
-
 <script lang="ts" setup>
 // @ts-nocheck
 import { useCreate } from '@/composables/curd/useCreate'
 import { useShow } from '@/composables/curd/useShow'
-import { nextTick, onMounted, ref, unref, watch } from 'vue'
+import { inject, nextTick, onMounted, ref, unref, watch } from 'vue'
 import http from '@/support/http'
-
+// @ts-ignore
 const props = defineProps({
   primary: [String, Number],
   api: String,
   hasPermissions: Array<Object>
 })
-
-const emit = defineEmits(['close'])
-
-const { formData, form, loading, submitForm, close, beforeCreate, beforeUpdate } = useCreate(props.api as string, props.primary)
-
-if (props.primary) {
-  const { afterShow } = useShow(props.api as string, props.primary, formData)
-  // 更新角色值
-  afterShow.value = (formData: any) => {
-    const data = unref(formData)
-    data.parent_id = data.parent_id ? [data.parent_id] : 0
-
-    if (!data.data_range) {
-      data.data_range = null
-    }
-
-    formData.value = data
-    // 这里需要获取角色的上级的权限以限制可用权限范围
-    getPermissions(data.parent_id)
-  }
-}
-
 const roles = ref()
 const permissions = ref()
 // 权限树对象
@@ -130,13 +107,11 @@ const departments = ref()
 const showDepartments = ref<boolean>(false)
 
 const permissionLoadingText = ref<string>('加载中...')
-
-// 获取权限
 const getPermissions = async (value: number = 0) => {
   if (value) {
-    // 获取角色权限
     http.get('permissions/roles/' + getParent(value), { from: 'parent_role' }).then(r => {
       permissions.value = r.data.data.permissions
+      console.log(permissions.value)
       setCheckedPermissions()
     })
   } else {
@@ -146,11 +121,29 @@ const getPermissions = async (value: number = 0) => {
     })
   }
 }
+const { formData, form, loading, submitForm, close, beforeCreate, beforeUpdate } = useCreate(props.api, props.primary)
 
-// 设置已选权限
+if (props.primary) {
+  const { afterShow } = useShow(props.api, props.primary, formData)
+
+  afterShow.value = (formData: any) => {
+    const data = unref(formData)
+    data.parent_id = data.parent_id ? [data.parent_id] : 0
+
+    if (!data.data_range) {
+      data.data_range = null
+    }
+    // 获取权限
+    getPermissions(data.parent_id)
+    formData.value = data
+  }
+} else {
+  getPermissions()
+}
+
 const setCheckedPermissions = () => {
   nextTick(() => {
-    props.hasPermissions.forEach(p => {
+    props.hasPermissions?.forEach(p => {
       permissionTree.value.setChecked(p.id, true, false)
     })
   })
@@ -159,8 +152,6 @@ const setCheckedPermissions = () => {
     permissionLoadingText.value = '暂无数据'
   }
 }
-
-// 获取角色信息
 const getRoles = () => {
   http.get(props.api, { id: props.primary ? props.primary : '' }).then(r => {
     roles.value = r.data.data
@@ -173,16 +164,11 @@ const getDepartments = () => {
   })
 }
 
-// 新增默认获取全部权限
-if (!props.primary) {
-  getPermissions()
-}
-
-// 页面挂载完成后
+const closeDialog = inject('closeDialog')
 onMounted(() => {
   getRoles()
   getDepartments()
-  close(() => emit('close'))
+  close(() => closeDialog())
   watch(
     formData,
     function (value) {
@@ -193,7 +179,7 @@ onMounted(() => {
   )
 })
 
-const selectPermissions = (checkedNodes, checkedKeys) => {
+const selectPermissions = (checkedNodes: any, checkedKeys: any) => {
   formData.value.permissions = checkedKeys.checkedKeys.concat(checkedKeys.halfCheckedKeys).sort()
 }
 
@@ -204,16 +190,20 @@ beforeCreate.value = () => {
 
 // 更新前的钩子
 beforeUpdate.value = () => {
-  const permissionIds = []
-  formData.value.permissions.forEach(item => {
+  const permissionIds: Array<any> = []
+  formData.value.permissions.forEach((item: any) => {
     permissionIds.push(item)
   })
-
   formData.value.permissions = permissionIds
   formData.value.parent_id = getParent(formData.value.parent_id)
+  console.log(formData.value.parent_id)
 }
 
 const getParent = (parentId: any) => {
+  if (typeof parentId === 'number') {
+    return parentId
+  }
+
   return typeof parentId === 'undefined' ? 0 : parentId[parentId.length - 1]
 }
 </script>
@@ -225,6 +215,6 @@ const getParent = (parentId: any) => {
   @apply flex flex-wrap pl-9;
 }
 :deep(.el-tree-node .is-expanded .el-tree-node__children .el-tree-node__content) {
-  padding-left: 0 !important;
+  padding-left: 0px !important;
 }
 </style>

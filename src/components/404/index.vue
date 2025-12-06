@@ -14,7 +14,7 @@
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/modules/app'
 import { computed } from 'vue'
-import notFound from '@/assets/404.png'
+import notFound from '@/public/assets/404.png'
 
 const { push } = useRouter()
 

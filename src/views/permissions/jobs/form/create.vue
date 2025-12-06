@@ -1,14 +1,14 @@
 <template>
   <el-form :model="formData" label-width="120px" ref="form" v-loading="loading" class="pr-4">
     <el-form-item label="岗位名称" prop="job_name" :rules="[{ required: true, message: '岗位名称必须填写' }]">
-      <el-input v-model="formData.job_name" name="job_name" clearable />
+      <el-input v-model="formData.job_name" name="job_name" clearable show-word-limit maxlength="30" />
     </el-form-item>
     <el-form-item label="岗位编码" prop="coding">
-      <el-input v-model="formData.coding" name="coding" clearable />
+      <el-input v-model="formData.coding" name="coding" clearable show-word-limit maxlength="20" />
     </el-form-item>
     <el-form-item label="状态" prop="status">
       <el-radio-group v-model="formData.status">
-        <el-radio v-for="item in options" :key="item.value" :value="item.value" name="status">{{ item.label }}</el-radio>
+        <el-radio v-for="item in options" :key="item.value" :label="item.value" name="status">{{ item.label }}</el-radio>
       </el-radio-group>
     </el-form-item>
     <el-form-item label="排序" prop="sort">
@@ -28,10 +28,10 @@
 import { useCreate } from '@/composables/curd/useCreate'
 import { useShow } from '@/composables/curd/useShow'
 
-import { onMounted } from 'vue'
+import { inject, onMounted } from 'vue'
 
 const props = defineProps({
-  primary: [Number, String],
+  primary: [String, Number],
   api: String
 })
 
@@ -43,10 +43,9 @@ formData.value.sort = 1
 if (props.primary) {
   useShow(props.api, props.primary, formData)
 }
-const emit = defineEmits(['close'])
-
+const closeDialog = inject('closeDialog')
 onMounted(() => {
-  close(() => emit('close'))
+  close(() => closeDialog())
 })
 
 const options = [

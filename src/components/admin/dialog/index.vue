@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :model-value="modelValue" :show-close="false" :fullscreen="isFullscreen" v-bind="$attrs" :width="width" :close="close" :before-close="beforeClose" :draggable="draggable">
+    <el-dialog :model-value="visiable" :class="_class" :show-close="false" :fullscreen="isFullscreen" v-bind="$attrs" :width="_width" :close="close" :before-close="beforeClose" draggable>
       <template #header="{ titleId, titleClass }">
         <div class="flex justify-between w-full">
           <div>
@@ -12,7 +12,7 @@
           </div>
         </div>
       </template>
-      <div class="pt-4">
+      <div :class="contentTop">
         <slot />
       </div>
       <template #footer v-if="showFooter">
@@ -38,7 +38,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-
+  contentTop: {
+    type: String,
+    default: 'pt-4'
+  },
   width: {
     type: String,
     required: false,
@@ -48,35 +51,42 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  draggable: {
-    type: Boolean,
-    default: true
+  _class: {
+    type: String,
+    default: ''
   }
 })
 
-const emits = defineEmits(['update:modelValue'])
+const visiable = defineModel({
+  type: Boolean,
+  default: false
+})
 
 const isFullscreen = ref(false)
 
-// const fullscreenIcon = computed(() => {
-//  return isFullscreen.value ? 'arrows-pointing-in' : 'arrows-pointing-out'
-// })
-// const fullscreen = () => {
-// isFullscreen.value = !isFullscreen.value
-// }
+/**
+const fullscreenIcon = computed(() => {
+  return isFullscreen.value ? 'arrows-pointing-in' : 'arrows-pointing-out'
+})
+
+const fullscreen = () => {
+  isFullscreen.value = !isFullscreen.value
+}
+*/
 
 const close = () => {
-  emits('update:modelValue', false)
+  visiable.value = false
+  // emits('update:modelValue', false)
 }
 
 // 遮罩关闭调用
 const beforeClose = () => {
-  emits('update:modelValue', false)
+  visiable.value = false
+  // emits('update:modelValue', false)
 }
-const width = ref<string>('')
-
+const _width = ref<string>()
 onMounted(() => {
-  width.value = props.width ? props.width : getWidth()
+  _width.value = props.width ? props.width : getWidth()
 })
 
 // 窗口尺寸
@@ -95,7 +105,7 @@ const getWidth = () => {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 :deep(.el-dialog) {
   border-radius: 0.5rem;
   .el-dialog__header {

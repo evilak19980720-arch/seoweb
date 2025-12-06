@@ -1,74 +1,97 @@
 <template>
   <div>
-    <Search :search="search" :reset="reset">
-      <template v-slot:body>
-        <el-form-item label="字典名称" prop="name">
-          <el-input v-model="query.name" name="name" clearable />
-        </el-form-item>
-        <el-form-item label="字典键名" prop="key">
-          <el-input v-model="query.key" name="key" clearable />
-        </el-form-item>
-        <el-form-item label="字典状态" prop="status">
-          <el-input v-model="query.status" name="status" clearable />
-        </el-form-item>
+    <catch-table
+      :columns="[
+        {
+          type: 'selection',
+          width: 80,
+          aligh: 'center'
+        },
+        {
+          label: 'ID',
+          prop: 'id',
+          width: 100
+        },
+        {
+          label: '字典名称',
+          prop: 'name'
+        },
+        {
+          label: '字典键名',
+          prop: 'key',
+          slot: 'key'
+        },
+        {
+          label: '字典状态',
+          prop: 'status',
+          slot: 'status'
+        },
+        {
+          label: '字典描述',
+          prop: 'description'
+        },
+        {
+          label: '创建时间',
+          prop: 'created_at'
+        },
+        {
+          type: 'operate',
+          label: '操作',
+          width: 200
+        }
+      ]"
+      :api="api"
+      :search-form="[
+        {
+          type: 'input',
+          label: '字典名称',
+          name: 'name'
+        },
+        {
+          type: 'input',
+          label: '字典键名',
+          name: 'key'
+        },
+        {
+          type: 'select',
+          label: '状态',
+          name: 'status',
+          api: 'status'
+        }
+      ]"
+    >
+      <template #key="scope">
+        <router-link :to="{ path: '/system/dictionary/values/' + scope.row.id }">
+          <el-text type="primary">{{ scope.row.key }}</el-text>
+        </router-link>
       </template>
-    </Search>
-
-    <div class="table-default">
-      <Operate :show="open" />
-      <el-table :data="tableData" class="mt-3" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="100" />
-        <el-table-column prop="name" label="字典名称" />
-        <el-table-column prop="key" label="字典键名">
-          <template #default="scope">
-            <router-link :to="{ path: '/system/dictionary/values/' + scope.row.id }">
-              <el-text type="primary">{{ scope.row.key }}</el-text>
-            </router-link>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="字典状态">
-          <template #default="scope">
-            <Status v-model="scope.row.status" :id="scope.row.id" :api="api" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="description" label="字典描述" />
-        <el-table-column label="操作" width="300">
-          <template #default="scope">
-            <Update @click="open(scope.row.id)" />
-            <Destroy @click="destroy(api, scope.row.id)" />
-            <router-link :to="{ path: '/system/dictionary/values/' + scope.row.id }">
-              <Show text="列表" class="ml-3" />
-            </router-link>
-          </template>
-        </el-table-column>
-      </el-table>
-      <Paginate />
-    </div>
-
-    <Dialog v-model="visible" :title="title" destroy-on-close>
-      <Create @close="close(reset)" :primary="id" :api="api" />
-    </Dialog>
+      <template #status="scope">
+        <Status v-model="scope.row.status" :id="scope.row.id" :api="api" />
+      </template>
+      <template #operation>
+        <el-button @click="generateEnum()">生成枚举</el-button>
+      </template>
+      <template #operate="scope">
+        <Show text="生成枚举" @click="generateEnum(scope.row.id)" icon="cursor-arrow-rays" />
+      </template>
+      <template #dialog="row">
+        <Create :primary="row?.id" :api="api" />
+      </template>
+    </catch-table>
   </div>
 </template>
 
 <script lang="ts" setup>
 // @ts-nocheck
-import { computed, onMounted } from 'vue'
-import Create from './create.vue'
-import { useGetList } from '@/composables/curd/useGetList'
-import { useDestroy } from '@/composables/curd/useDestroy'
-import { useOpen } from '@/composables/curd/useOpen'
+import http from '@/support/http'
+import Create from './form/create.vue'
+import Message from '@/support/message'
 
 const api = 'system/dictionary'
 
-const { data, query, search, reset, loading } = useGetList(api)
-const { destroy, deleted } = useDestroy()
-const { open, close, title, visible, id } = useOpen()
-
-const tableData = computed(() => data.value?.data)
-
-onMounted(() => {
-  search()
-  deleted(reset)
-})
+const generateEnum = (id: number = 0) => {
+  http.post(`system/dictionary/enums/${id}`).then(r => {
+    Message.success('枚举已在 Common 模块下 Eums 目录下生成')
+  })
+}
 </script>

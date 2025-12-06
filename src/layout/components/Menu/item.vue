@@ -1,15 +1,15 @@
 <template>
-  <el-sub-menu :index="menu?.path" :class="subMenuClass" v-if="menu?.children?.length" :key="menu?.path">
+  <el-sub-menu :index="menu?.path" :class="subMenuClass" v-if="menu?.children?.length">
     <template #title>
       <el-icon>
-        <Icon :name="menu?.meta?.icon" v-if="menu?.meta?.icon" class="text-sm" />
+        <Icon :name="menu?.meta?.icon" class="text-sm" v-if="menu?.meta?.icon" />
       </el-icon>
       <span>{{ menu?.meta?.title }}</span>
     </template>
     <slot />
   </el-sub-menu>
 
-  <el-menu-item v-else class="ct-menu-item" :index="menu?.path" @click="isMiniScreen() && store.changeExpaned()" :key="menu?.name">
+  <el-menu-item v-else class="ct-menu-item" :index="menu?.path" @click="isMiniScreen() && store.changeExpaned()">
     <el-icon>
       <Icon :name="menu?.meta?.icon" v-if="menu?.meta?.icon" class="text-sm" />
     </el-icon>
@@ -20,7 +20,7 @@
   </el-menu-item>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" name="MenuItem" setup>
 import { Menu } from '@/types/Menu'
 import { PropType } from 'vue'
 import { useAppStore } from '@/stores/modules/app'
@@ -32,13 +32,13 @@ defineProps({
   subMenuClass: {
     type: String,
     require: true,
-    default: '',
+    default: ''
   },
 
   menu: {
     type: Object as PropType<Menu>,
-    require: true,
-  },
+    require: true
+  }
 })
 
 const openUrl = (path: string) => {
@@ -48,7 +48,7 @@ const openUrl = (path: string) => {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 :deep(.el-menu) {
   background-color: var(--sider-sub-menu-bg-color);
 }

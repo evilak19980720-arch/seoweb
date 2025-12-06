@@ -1,4 +1,5 @@
 // login user type
+
 import { Permission } from './Permission'
 
 export interface User {
@@ -16,6 +17,7 @@ export interface User {
 
   roles?: string[]
 
-  permissions?: Permission[]
-  from?: string
+  permissions?: Permission[],
+
+  actions?: Array<String>
 }
