@@ -16,7 +16,7 @@ const i18n = createI18n({
   fallbackLocale: 'zh',
   globalInjection: true,
   legacy: false,
-  messages: {} // 初始化为空对象，语言包将从缓存或后端加载
+  messages: {}
 })
 
 // 扩展 i18n 类型
@@ -64,17 +64,22 @@ const loadFromCache = (locale: string, allowExpired = false): boolean => {
 /**
  * 从后端加载语言包
  * @param locale 语言代码
+ * @returns boolean 是否成功加载
  */
-const loadFromBackend = async (locale: string) => {
+const loadFromBackend = async (locale: string): Promise<boolean> => {
   try {
-    await http.get(`/lang/${locale}`).then((response:any) => {
+    const response = await http.get(`/lang/${locale}`)
+    if (response.data?.data) {
       setLanguagePack(locale, response.data.data)
       // 缓存语言包和时间戳
       Cache.set(`${LANG_CACHE_KEY}${locale}`, JSON.stringify(response.data.data))
       Cache.set(`${LANG_CACHE_TIME_KEY}${locale}`, Date.now().toString())
-    })
+      return true
+    }
+    return false
   } catch (error) {
     console.log('语言包加载失败', error)
+    return false
   }
 }
 
@@ -87,7 +92,7 @@ const loadTranslations = async (locale: string): Promise<boolean> => {
   if (loadFromCache(locale)) return true
 
   // 2. 尝试从后端加载
-  await loadFromBackend(locale)
+  if (await loadFromBackend(locale)) return true
 
   // 3. 使用过期缓存兜底
   if (loadFromCache(locale, true)) return true
