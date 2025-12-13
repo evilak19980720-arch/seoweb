@@ -11,6 +11,11 @@ const rootPath = resolve(__dirname)
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
+    resolve: {
+      alias: {
+        '@': resolve(rootPath, './src')
+      }
+    },
     plugins: [
       vue({
         script: {
@@ -18,15 +23,6 @@ export default defineConfig(({ command, mode }) => {
         }
       }),
       vueJsx(),
-      alias({
-        entries: [
-          {
-            find: '@',
-            replacement: resolve(rootPath, './src')
-          }
-        ]
-      }),
-
       AutoImport({
         imports: ['vue', 'vue-router', 'pinia', '@vueuse/core']
         // resolvers: [ ElementPlusResolver({importStyle: 'sass'}) ]
