@@ -17,6 +17,7 @@ import hljsVuePlugin from '@highlightjs/vue-plugin'
 import { createVersionPolling } from 'version-polling'
 import Message from './message'
 import { useAppStore } from '@/stores/modules/app'
+import { initPluginSystem } from '@/support/remote-sfc'
 /**
  * catchadmin
  */
@@ -47,7 +48,16 @@ export default class CatchAdmin {
       await this.useI18n()
 
       // 继续初始化其他组件
-      this.installDirectives().installForm().useRouter().installEcharts().useHighlightPlugin().useFormCreate().initAppSetting().useVersionPolling().mount()
+      this.installDirectives()
+        .installForm()
+        .useRouter()
+        .installEcharts()
+        .useHighlightPlugin()
+        .useFormCreate()
+        .initAppSetting()
+        .useVersionPolling()
+        .usePluginSystem()  // 初始化插件系统
+        .mount()
     } catch (error) {
       console.error('应用启动失败:', error)
     }
@@ -172,6 +182,15 @@ export default class CatchAdmin {
       }
     })
 
+    return this
+  }
+
+  /**
+   * 初始化插件系统
+   * 提供运行时动态加载 Vue 组件的能力
+   */
+  protected usePluginSystem(): CatchAdmin {
+    initPluginSystem(this.app)
     return this
   }
 }

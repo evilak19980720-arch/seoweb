@@ -7,6 +7,7 @@ import { RouteRecordRaw } from 'vue-router'
 import { toRaw } from 'vue'
 import { getModuleViewComponents } from '@/router/constantRoutes'
 import { useAppStore } from '@/stores/modules/app'
+import { createAsyncPluginComponent, isRemoteComponent } from '@/support/remote-sfc'
 
 interface Permissions {
   menus: Menu[]
@@ -159,8 +160,14 @@ export const usePermissionsStore = defineStore('PermissionsStore', {
           let importComponent
           if (permission.type === MenuType.TOP_TYPE) {
             importComponent = () => import('@/layout/index.vue')
+          } else if (isRemoteComponent(permission.component)) {
+            importComponent = createAsyncPluginComponent(permission.component)
           } else {
             importComponent = viewComponents.get(permission.component)
+            if (!importComponent) {
+              console.error(`[PermissionsStore] component not found: ${permission.component}`)
+              importComponent = () => import('@/components/404/index.vue')
+            }
           }
           const menu: Menu = Object.assign({
             path: this.resolveRoutePathRoutePath(permission.route, path),
