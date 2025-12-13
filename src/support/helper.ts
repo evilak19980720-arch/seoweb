@@ -5,7 +5,6 @@
 import Cache from '@/support/cache'
 import i18n from '@/i18n'
 import moment from 'moment'
-import type { RouteRecordRaw } from 'vue-router'
 const AUTH_TOKEN = 'auth_token'
 
 /**
@@ -298,31 +297,3 @@ export function getLoginPath() {
   return loginPath
 }
 
-/**
- * 动态加载模块路由
- * 自动扫描 views 子目录中的 routes.ts 文件并加载
- *
- * @returns RouteRecordRaw[] 路由数组
- */
-export function loadModuleRoute(): RouteRecordRaw[] {
-  const dynamicRoutes: RouteRecordRaw[] = []
-
-  // 使用 Vite 的 import.meta.glob 扫描所有 views 子目录下的 routes.ts
-  const routeModules = import.meta.glob('../views/**/routes.ts', { eager: true })
-
-  Object.keys(routeModules).forEach((path) => {
-    const module = routeModules[path] as any
-
-    // 如果模块导出了路由数组（命名导出）
-    if (module.pluginRoutes && Array.isArray(module.pluginRoutes)) {
-      dynamicRoutes.push(...module.pluginRoutes)
-    }
-
-    // 也支持 default 导出
-    if (module.default && Array.isArray(module.default)) {
-      dynamicRoutes.push(...module.default)
-    }
-  })
-
-  return dynamicRoutes
-}

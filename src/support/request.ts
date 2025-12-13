@@ -2,7 +2,6 @@ import { Code } from '@/enum/app'
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { getAuthToken, getBaseUrl, isUndefined, removeAuthToken } from './helper'
 import Message from './message'
-import router from '@/router'
 import ResponseData from '@/types/responseData'
 import { isRef, unref } from 'vue'
 import { useAppStore } from '@/stores/modules/app'
@@ -219,15 +218,16 @@ class Request {
           Message.error(message || 'Error')
         } else if (code === Code.LOST_LOGIN || code === Code.LOGIN_EXPIRED) {
           // to re-login
-          Message.confirm(message + '，需要重新登陆', function () {
+          Message.confirm(message + '，需要重新登陆', async function () {
             removeAuthToken()
+            const router = (await import('@/router')).default
             router.push('/login')
           })
         } else if (code === Code.LOGIN_BLACKLIST || code === Code.USER_FORBIDDEN) {
           Message.error(message || 'Error')
           removeAuthToken()
           // to login page
-          router.push('/login')
+          import('@/router').then(m => m.default.push('/login'))
         } else {
           Message.error(message || 'Error')
         }

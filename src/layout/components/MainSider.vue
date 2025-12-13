@@ -1,5 +1,5 @@
 <template>
-  <div class="main-sider-container w-16 h-screen fixed left-0 top-0 z-[1001] flex-col hidden sm:flex">
+  <div class="main-sider-container w-20 h-screen fixed left-0 top-0 z-[1001] flex-col hidden sm:flex">
     <!-- Logo -->
     <div class="flex items-center justify-center border-b h-14 logo-bg dark:border-b-gray-800">
       <img v-if="setting.dashboard.logo" :src="warpHost(setting.dashboard.logo) || LogPng" class="rounded-full h-9 w-9" />
@@ -13,20 +13,15 @@
         :key="menu.name"
         :class="[
           'main-menu-item',
-          'w-16 h-14 flex items-center justify-center cursor-pointer transition-colors duration-300 relative',
+          'w-20 py-3 flex flex-col items-center justify-center cursor-pointer transition-colors duration-300 relative',
           isActiveMenu(menu) ? 'active' : ''
         ]"
         @click="handleMenuClick(menu)"
       >
-        <el-tooltip
-          effect="dark"
-          :content="menu.meta?.title"
-          placement="right"
-        >
-          <el-icon class="!w-16 !h-12">
-            <Icon :name="menu.meta?.icon || 'squares-2x2'" class="text-sm" />
-          </el-icon>
-        </el-tooltip>
+        <el-icon class="!w-5 !h-5 mb-1">
+          <Icon :name="menu.meta?.icon || 'squares-2x2'" />
+        </el-icon>
+        <span class="text-xs leading-tight text-center truncate w-full px-1">{{ menu.meta?.title }}</span>
       </div>
     </div>
 
@@ -121,18 +116,6 @@ const toggleLayout = () => {
   color: var(--el-color-primary);
 }
 
-/* 激活状态指示条 - 使用伪元素 */
-.main-menu-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 24px;
-  background-color: var(--el-color-primary);
-  border-radius: 0 2px 2px 0;
-}
 
 /* 自定义滚动条样式 */
 .main-menu-list::-webkit-scrollbar {

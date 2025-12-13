@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import type { App } from 'vue'
-import { isProd, getLoginPath, loadModuleRoute } from '@/support/helper'
+import { isProd, getLoginPath } from '@/support/helper'
 // module routers
 // import { getModuleViewComponents } from './constantRoutes'
 
@@ -68,7 +68,7 @@ export const constantRoutes: RouteRecordRaw[] = [
       }
     ]
   }
-].concat(notInProdRoute() as any).concat(loadModuleRoute() as any)
+].concat(notInProdRoute() as any)
 
 // default routes, it will not change to menus
 const defaultRoutes: RouteRecordRaw[] = [
