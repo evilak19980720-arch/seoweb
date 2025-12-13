@@ -29,7 +29,8 @@
     "vue-draggable-plus": "^0.6.0",
     "vue-echarts": "^7.0.3",
     "vue-i18n": "11.1.2",
-    "vue-router": "4.5.1"
+    "vue-router": "4.5.1",
+    "vue3-sfc-loader": "^0.9.5"
   },
   "devDependencies": {
     "@catppuccin/highlightjs": "1.0.0",
