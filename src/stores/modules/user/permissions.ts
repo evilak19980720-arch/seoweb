@@ -161,7 +161,7 @@ export const usePermissionsStore = defineStore('PermissionsStore', {
           if (permission.type === MenuType.TOP_TYPE) {
             importComponent = () => import('@/layout/index.vue')
           } else if (isRemoteComponent(permission.component)) {
-            importComponent = createAsyncPluginComponent(permission.component)
+            importComponent = createAsyncPluginComponent(permission.remote_component)
           } else {
             importComponent = viewComponents.get(permission.component)
             if (!importComponent) {

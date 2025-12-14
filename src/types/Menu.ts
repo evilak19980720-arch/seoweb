@@ -29,5 +29,7 @@ export interface Menu extends Omit<RouteRecordRaw, 'meta'> {
 
   component?: Component
 
+  remote_component?: string
+
   children?: Menu[]
 }
