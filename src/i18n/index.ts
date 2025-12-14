@@ -61,6 +61,11 @@ const loadFromCache = (locale: string, allowExpired = false): boolean => {
   return false
 }
 
+try {
+    const initLocale = Cache.get('language') || 'zh'
+    loadFromCache(initLocale, true)
+} catch (error) {}
+
 /**
  * 从后端加载语言包
  * @param locale 语言代码
