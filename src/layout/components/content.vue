@@ -9,7 +9,7 @@
             <component :is="Component" :key="routeKey" />
         </router-view>
       </div>
-      <div class="w-full h-4 leading-10 text-center text-gray-400"><el-link href="https://catchadmin.com" target="_blank">CatchAdmin PRO</el-link> 管理系统 @copyright 2018 ~ {{ year }}</div>
+      <div class="w-full h-4 leading-10 text-center text-gray-400"><el-link href="https://catchadmin.com" target="_blank">CatchAdmin</el-link> 管理系统 @copyright 2018 ~ {{ year }}</div>
     </div>
   </div>
 </template>

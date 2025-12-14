@@ -25,6 +25,7 @@
           <div class="grid grid-cols-2 gap-3">
             <div
               v-for="mode in themeModes"
+              :key="mode.icon"
               :class="[
                 'flex flex-col items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-all',
                 isDarkMode === mode.value
