@@ -215,7 +215,8 @@ export function clearCache(url?: string): void {
 export function isRemoteComponent(url: string): boolean {
   return url.startsWith('http://') ||
          url.startsWith('https://') ||
-         url.startsWith('/api/')
+         url.startsWith('/api/') ||
+         url.startsWith('api/')
 }
 
 // 默认导出
