@@ -105,18 +105,19 @@ export default defineComponent({
     const permissionsStore = usePermissionsStore()
     const userStore = useUserStore()
     const appStore = useAppStore()
-    // 后端的 permissions 返回 undefined，则认为该后端无权限系统
-    const permissions = userStore.getPermissions === undefined ? [] : userStore.getPermissions
+    
+    // 获取当前权限（响应式 getter）
+    const getPermissions = () => userStore.getPermissions === undefined ? [] : userStore.getPermissions
 
     // 初始化菜单节点
-    const vnodes = ref(getVNodes(filterMenus(permissionsStore.getMenusFrom(permissions, true)), props.subMenuClass))
+    const vnodes = ref(getVNodes(filterMenus(permissionsStore.getMenusFrom(getPermissions(), true)), props.subMenuClass))
     
-    // 监听双栏模式状态和激活菜单变化
+    // 监听双栏模式状态、激活菜单变化、以及权限变化
     watch(
-      () => [permissionsStore.getVerticalActiveMenuName, appStore.getVertical],
+      () => [permissionsStore.getVerticalActiveMenuName, appStore.getVertical, userStore.getPermissions],
       () => {
-        // 双栏模式下，菜单已经在 getMenusFrom 中被过滤
-        vnodes.value = getVNodes(filterMenus(permissionsStore.getMenusFrom(permissions, true)), props.subMenuClass)
+        // 重新获取最新权限并刷新菜单
+        vnodes.value = getVNodes(filterMenus(permissionsStore.getMenusFrom(getPermissions(), true)), props.subMenuClass)
       }
     )
     /**
