@@ -7,6 +7,7 @@ export interface Permission {
   component: string
   module: string
   permission_mark: string
+  remote_component: string|null
   route: string
   redirect: string
   keepalive: boolean

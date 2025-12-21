@@ -140,6 +140,7 @@
 import { useCreate } from '@/composables/curd/useCreate'
 import { useShow } from '@/composables/curd/useShow'
 import { useOpen } from '@/composables/curd/useOpen'
+import { usePermissionsStore } from "@/stores/modules/user/permissions";
 import { inject, onMounted, ref, watch } from 'vue'
 import http from '@/support/http'
 import { MenuType } from '@/enum/app'
@@ -152,7 +153,7 @@ const props = defineProps({
 const activeMenuIntro =
   '<div>如果是访问内页的菜单路由，例如创建文章 create/post, 虽然它隶属于文章列表，但实际上并不会嵌套在文章列表路由里</div><div>而是单独的一个路由，并且是不显示在左侧菜单的。所以在访问它的时候，需要左侧菜单高亮，则需要设置该参数</div>'
 
-const { formData, form, loading, submitForm, close, beforeCreate, beforeUpdate } = useCreate(props.api, props.primary)
+const { formData, form, loading, submitForm, close, beforeCreate, beforeUpdate, afterCreate, afterUpdate } = useCreate(props.api, props.primary)
 
 // 选择 icon
 const { visible } = useOpen()
@@ -233,6 +234,22 @@ beforeCreate.value = () => {
 // 更新前的钩子
 beforeUpdate.value = () => {
   formData.value.parent_id = getParent(formData.value.parent_id)
+}
+
+// 创建后的钩子
+afterCreate.value = async () => {
+    if (formData.value.type !== 2) {
+        const permissionStore = usePermissionsStore()
+        await permissionStore.refreshMenus()
+    }
+}
+
+// 更新后的钩子
+afterUpdate.value = async () => {
+    if (formData.value.type !== 2) {
+        const permissionStore = usePermissionsStore()
+        await permissionStore.refreshMenus()
+    }
 }
 
 const getParent = (parentId: any) => {

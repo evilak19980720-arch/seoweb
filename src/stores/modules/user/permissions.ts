@@ -8,6 +8,8 @@ import { toRaw } from 'vue'
 import { getModuleViewComponents } from '@/router/constantRoutes'
 import { useAppStore } from '@/stores/modules/app'
 import { createAsyncPluginComponent, isRemoteComponent } from '@/support/remote-sfc'
+import { useUserStore } from '@/stores/modules/user'
+import router from "@/router";
 
 interface Permissions {
   menus: Menu[]
@@ -161,7 +163,7 @@ export const usePermissionsStore = defineStore('PermissionsStore', {
           if (permission.type === MenuType.TOP_TYPE) {
             importComponent = () => import('@/layout/index.vue')
           } else if (isRemoteComponent(permission.component)) {
-            importComponent = createAsyncPluginComponent(permission.remote_component)
+            importComponent = createAsyncPluginComponent(permission.remote_component as string)
           } else {
             importComponent = viewComponents.get(permission.component)
             if (!importComponent) {
@@ -232,6 +234,27 @@ export const usePermissionsStore = defineStore('PermissionsStore', {
 
       // 去除尾部的 /
       return route.replace(/\/$/g, '')
+    },
+
+    async refreshMenus  () {
+      try {
+          const userStore = useUserStore()
+          // 重新获取用户信息（包含最新权限）
+          await userStore.getUserInfo()
+          // 强制刷新菜单并获取新的异步路由
+          const asyncRoutes = this.getAsyncMenusFrom(toRaw(userStore.getPermissions as Permission[]), true)
+          // 动态添加新路由
+          asyncRoutes.forEach((route: any) => {
+              // 检查路由是否已存在，避免重复添加
+              if (! router.hasRoute(route.name)) {
+                  router.addRoute(route)
+              }
+          })
+          // 刷新菜单显示
+          this.getMenusFrom(userStore.getPermissions as Permission[], true)
+      } catch (error) {
+          console.error('刷新菜单失败', error)
+      }
     }
   }
 })
