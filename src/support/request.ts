@@ -234,7 +234,7 @@ class Request {
         return Promise.reject(new Error(message || 'Error'))
       },
       error => {
-        if (!isUndefined(error.response)) {
+        if (! isUndefined(error.response)) {
           // 打印数据
           if (typeof error.response.data === 'string') {
             // 异常抽屉展示
@@ -249,20 +249,24 @@ class Request {
             )
           } else {
             const trace = error.response.data.trace
-            // 如果没有 trace 堆栈信息
-            if (trace instanceof Array || error.response.data?.startsWith('<script>')) {
-              // 异常抽屉展示
-              const appStore = useAppStore()
-              appStore.setIsExceptionShow(
-                true,
-                {
-                  message: error.response.data.message,
-                  trace: trace instanceof Array ? trace : []
-                },
-                trace instanceof Array ? '' : error.response.data
-              )
+            if (isUndefined(trace)) {
+                Message.error(error.response.data?.message || 'Internal Server Error')
+            } else {
+                // 如果没有 trace 堆栈信息
+                if (trace instanceof Array || error.response.data?.startsWith('<script>')) {
+                    // 异常抽屉展示
+                    const appStore = useAppStore()
+                    appStore.setIsExceptionShow(
+                        true,
+                        {
+                            message: error.response.data.message,
+                            trace: trace instanceof Array ? trace : []
+                        },
+                        trace instanceof Array ? '' : error.response.data
+                    )
+                }
             }
-            Message.error(error.response.data?.message || 'Internal Server Error')
+            // Message.error(error.response.data?.message || 'Internal Server Error')
           }
         } else {
           Message.error('服务异常: ' + error.message)
