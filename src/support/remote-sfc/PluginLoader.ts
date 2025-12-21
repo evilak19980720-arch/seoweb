@@ -135,7 +135,7 @@ export async function loadRemoteComponent(url: string): Promise<Component> {
   if (componentCache.has(url)) return componentCache.get(url)!
   // 并发控制：同一 URL 多次调用只加载一次
   if (loadingCache.has(url)) return loadingCache.get(url)!
-  
+
   const promise = (async () => {
     try {
       const component = await loadModule(url, loaderOptions as any) as Component
@@ -152,7 +152,7 @@ export async function loadRemoteComponent(url: string): Promise<Component> {
       loadingCache.delete(url) // 加载完成后移除
     }
   })()
-  
+
   loadingCache.set(url, promise)
   return promise
 }
@@ -187,7 +187,11 @@ export function clearModuleCache(url?: string): void {
 }
 
 /** 检查是否远程组件 */
-export function isRemoteComponent(url: string): boolean {
+export function isRemoteComponent(url: string|null): boolean {
+  if (! url) {
+      return false
+  }
+
   return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/api/') || url.startsWith('api/')
 }
 
