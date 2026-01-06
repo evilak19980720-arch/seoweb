@@ -5,7 +5,7 @@
         <span>{{ $t('generate.code.title') }}</span>
       </div>
     </template>
-    <div class="w-full sm:w-[40%] mx-auto">
+    <div class="w-full px-4 sm:px-0 sm:w-4/5 md:w-3/4 lg:w-1/2 xl:w-2/5 mx-auto">
       <el-form :model="gen" ref="form" label-width="100px">
         <el-form-item
           :label="$t('generate.code.module.name')"
@@ -57,20 +57,18 @@
             </el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <div class="flex">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
           <el-form-item :label="$t('generate.code.paginate.name')" prop="paginate">
             <el-switch v-model="gen.paginate" inline-prompt :active-text="$t('system.yes')" :inactive-text="$t('system.no')" />
+            <span class="ml-2 text-sm text-gray-400">{{ $t('generate.code.paginate.placeholder') }}</span>
           </el-form-item>
-          <el-form-item label-width="15px">
-            <div class="text-sm text-gray-300">{{ $t('generate.code.paginate.placeholder') }}</div>
-          </el-form-item>
-          <el-form-item :label="$t('generate.code.gen.form')" prop="form" label-width="150px">
+          <el-form-item :label="$t('generate.code.gen.form')" prop="form">
             <el-switch v-model="gen.form" inline-prompt :active-text="$t('system.yes')" :inactive-text="$t('system.no')" />
           </el-form-item>
-          <el-form-item :label="$t('generate.code.gen.dymaic')" prop="dymaic" label-width="150px" v-if="false">
+          <el-form-item :label="$t('generate.code.gen.dymaic')" prop="dymaic">
             <el-switch v-model="gen.dymaic" inline-prompt :active-text="$t('system.yes')" :inactive-text="$t('system.no')" />
           </el-form-item>
-          <el-form-item :label="$t('generate.code.gen.dialogForm')" prop="dialogForm" v-if="gen.dymaic">
+          <el-form-item v-if="gen.dymaic" :label="$t('generate.code.gen.dialogForm')" prop="dialogForm">
             <el-switch v-model="gen.dialogForm" inline-prompt :active-text="$t('system.yes')" :inactive-text="$t('system.no')" />
           </el-form-item>
         </div>

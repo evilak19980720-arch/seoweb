@@ -26,12 +26,12 @@ const isMobile = ref(isMiniScreen())
 
 // 双栏模式下的样式（无过渡）
 const layoutSideVertical = ' h-screen z-[1000] sm:z-[999] absolute top-0 sm:fixed sider-bg'
-const layoutSideVerticalOpen = 'w-56 left-0 sm:left-20' + layoutSideVertical
+const layoutSideVerticalOpen = 'w-48 left-0 sm:left-20' + layoutSideVertical
 const layoutSideVerticalHidden = 'w-0 sm:w-0 left-0 sm:left-20' + layoutSideVertical
 
 // 单栏模式下的样式（无过渡）
 const layoutSideSingle = ' h-screen z-[1000] sm:z-0 absolute top-0 left-0 sm:fixed sider-bg'
-const layoutSideSingleOpen = 'w-56' + layoutSideSingle
+const layoutSideSingleOpen = 'w-48' + layoutSideSingle
 const layoutSideSingleHidden = 'w-0 sm:w-16' + layoutSideSingle
 
 // 是否是小屏幕
