@@ -8,6 +8,14 @@ interface exceptions {
   trace: Array<object>
 }
 
+interface layoutConfigs {
+  accordion: boolean
+  showCollapseBtn: boolean
+  showBreadcrumb: boolean
+  showLang: boolean
+  showTabs: boolean
+}
+
 interface setting {
   dashboard: {
     name: string
@@ -46,6 +54,10 @@ type app = {
 
   is_vertical: boolean
 
+  themeColor: string
+
+  layoutConfigs: layoutConfigs
+
   setting: setting
 }
 
@@ -64,7 +76,16 @@ export const useAppStore = defineStore('app', {
       trace: []
     },
     serverPrint: '',
-    is_vertical: Cache.get('layout_mode') === 'vertical',
+    is_vertical: Cache.get('layout_mode') !== 'single',
+    themeColor: Cache.get('theme_color') || '#4f46e5',
+    layoutConfigs: {
+      accordion: true,
+      showCollapseBtn: true,
+      showBreadcrumb: true,
+      showLang: true,
+      showTabs: true,
+      ...Cache.get('layout_configs')
+    },
     setting: {
       dashboard: {
         name: '管理后台',
@@ -120,6 +141,14 @@ export const useAppStore = defineStore('app', {
       return this.is_vertical
     },
 
+    getThemeColor(): string {
+      return this.themeColor
+    },
+
+    getLayoutConfigs(): layoutConfigs {
+      return this.layoutConfigs
+    },
+
     getSetting(): setting {
       return this.setting
     }
@@ -170,9 +199,20 @@ export const useAppStore = defineStore('app', {
       this.serverPrint = serverPrint
     },
 
-    setVertical(isVertical = false) {
+    setVertical(isVertical = true) {
       this.is_vertical = isVertical
       Cache.set('layout_mode', isVertical ? 'vertical' : 'single')
+    },
+
+    setThemeColor(color: string) {
+      this.themeColor = color
+      Cache.set('theme_color', color)
+      document.documentElement.style.setProperty('--el-color-primary', color)
+    },
+
+    setLayoutConfigs(configs: Partial<layoutConfigs>) {
+      this.layoutConfigs = { ...this.layoutConfigs, ...configs }
+      Cache.set('layout_configs', this.layoutConfigs)
     },
 
     setSetting() {

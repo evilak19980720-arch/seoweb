@@ -15,11 +15,20 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { useAppStore } from '@/stores/modules/app'
 import MainSider from './components/MainSider.vue'
 import SettingsDrawer from './components/SettingsDrawer.vue'
 
 const appStore = useAppStore()
+
+// 页面加载时应用持久化的主题色
+onMounted(() => {
+  const savedColor = appStore.getThemeColor
+  if (savedColor) {
+    document.documentElement.style.setProperty('--el-color-primary', savedColor)
+  }
+})
 </script>
 
 <style scoped>

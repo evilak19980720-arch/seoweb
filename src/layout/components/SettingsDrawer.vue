@@ -25,7 +25,6 @@
           <div class="grid grid-cols-2 gap-3">
             <div
               v-for="mode in themeModes"
-              :key="mode.icon"
               :class="[
                 'flex flex-col items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-all',
                 isDarkMode === mode.value
@@ -105,19 +104,23 @@
           <div class="flex flex-col gap-4">
             <div class="flex justify-between items-center text-sm text-gray-700 dark:text-gray-300">
               <span>侧边栏手风琴模式</span>
-              <el-switch v-model="configs.accordion" />
+              <el-switch :model-value="configs.accordion" @update:model-value="updateConfig('accordion', $event)" />
             </div>
             <div class="flex justify-between items-center text-sm text-gray-700 dark:text-gray-300">
               <span>显示折叠按钮</span>
-              <el-switch v-model="configs.showCollapseBtn" />
+              <el-switch :model-value="configs.showCollapseBtn" @update:model-value="updateConfig('showCollapseBtn', $event)" />
             </div>
             <div class="flex justify-between items-center text-sm text-gray-700 dark:text-gray-300">
               <span>显示面包屑导航</span>
-              <el-switch v-model="configs.showBreadcrumb" />
+              <el-switch :model-value="configs.showBreadcrumb" @update:model-value="updateConfig('showBreadcrumb', $event)" />
             </div>
             <div class="flex justify-between items-center text-sm text-gray-700 dark:text-gray-300">
               <span>显示多语言选择</span>
-              <el-switch v-model="configs.showLang" />
+              <el-switch :model-value="configs.showLang" @update:model-value="updateConfig('showLang', $event)" />
+            </div>
+            <div class="flex justify-between items-center text-sm text-gray-700 dark:text-gray-300">
+              <span>显示页面标签</span>
+              <el-switch :model-value="configs.showTabs" @update:model-value="updateConfig('showTabs', $event)" />
             </div>
           </div>
         </div>
@@ -150,9 +153,9 @@ const toggleDark = useToggle(isDark)
 const themeModes = [
   { value: false, label: '浅色', icon: 'sun' },
   { value: true, label: '深色', icon: 'moon' }
-]
+] as const
 
-const isDarkMode = computed(() => unref(isDark))
+const isDarkMode = computed(() => isDark.value)
 
 const switchThemeMode = (isDarkValue: boolean) => {
   // 如果当前状态与目标状态不同，则切换
@@ -184,35 +187,35 @@ const switchLayout = (layout: string) => {
 
 // 主题色
 const themeColors = [
-  '#409EFF', // Element Plus 默认蓝
+  '#4f46e5', // 系统默认靛蓝
+  '#409EFF', // Element Plus 蓝
   '#67C23A', // 绿色
   '#E6A23C', // 橙色
   '#F56C6C', // 红色
-  '#909399', // 灰色
   '#722ED1', // 紫色
   '#13C2C2'  // 青色
-]
+] as const
 
-const currentThemeColor = ref('#409EFF')
+const currentThemeColor = computed({
+  get: () => appStore.getThemeColor,
+  set: (val: string) => appStore.setThemeColor(val)
+})
 
 const switchThemeColor = (color: string) => {
-  currentThemeColor.value = color
-  // 实现主题色切换逻辑
-  document.documentElement.style.setProperty('--el-color-primary', color)
+  appStore.setThemeColor(color)
 }
 
 const resetThemeColor = () => {
-  currentThemeColor.value = '#409EFF'
-  document.documentElement.style.setProperty('--el-color-primary', '#409EFF')
+  appStore.setThemeColor('#4f46e5')
 }
 
-// 基础配置
-const configs = ref({
-  accordion: true,
-  showCollapseBtn: true,
-  showBreadcrumb: true,
-  showLang: true
-})
+// 基础配置 - 使用 store 中的配置
+const configs = computed(() => appStore.getLayoutConfigs)
+
+type LayoutConfigKey = 'accordion' | 'showCollapseBtn' | 'showBreadcrumb' | 'showLang' | 'showTabs'
+const updateConfig = (key: LayoutConfigKey, value: boolean) => {
+  appStore.setLayoutConfigs({ [key]: value })
+}
 
 // 复制配置
 const copyConfig = () => {
@@ -234,8 +237,8 @@ const copyConfig = () => {
 
 // 重置配置
 const resetConfig = () => {
-  // 重置为单栏布局
-  appStore.setVertical(false)
+  // 重置为双栏布局（默认）
+  appStore.setVertical(true)
 
   // 重置为浅色模式
   if (unref(isDark)) {
@@ -247,14 +250,13 @@ const resetConfig = () => {
   resetThemeColor()
 
   // 重置配置项
-  configs.value = {
+  appStore.setLayoutConfigs({
     accordion: true,
     showCollapseBtn: true,
     showBreadcrumb: true,
-    showLang: true
-  }
-
-  Message.success('已恢复默认配置')
+    showLang: true,
+    showTabs: true
+  })
 }
 </script>
 

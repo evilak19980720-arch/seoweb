@@ -7,7 +7,7 @@
     :collapse="!appStore.isExpand"
     :collapse-transition="false"
     :router="true"
-    :unique-opened="true"
+    :unique-opened="appStore.getLayoutConfigs.accordion"
   >
     <slot />
   </el-menu>
