@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { UserFilled } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/modules/user'
 import { warpHost } from '@/support/helper'
@@ -24,8 +25,13 @@ const props = defineProps({
   shape: {
     type: String,
     default: 'circle'
+  },
+  // 当 avatar 为空时，是否使用当前登录用户的头像作为默认值
+  fallbackToUser: {
+    type: Boolean,
+    default: true
   }
 })
 
-const avatarSrc = warpHost(props.avatar ? props.avatar : userStore.getAvatar)
+const avatarSrc = computed(() => warpHost(props.avatar || (props.fallbackToUser ? userStore.getAvatar : null)))
 </script>
