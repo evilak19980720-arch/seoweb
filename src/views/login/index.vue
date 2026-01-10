@@ -6,7 +6,8 @@
             </div>-->
       <div class="w-full pt-6 pb-6 pl-4 pr-4 mx-auto">
         <div class="flex mt-2">
-          <img :src="logo" class="w-8 mx-auto" />
+          <!-- 替换 Logo -->
+          <!--<img :src="logo" class="w-8 mx-auto" />-->
         </div>
         <div class="w-full mt-6 mb-8 text-2xl text-center text-indigo-700">Hi, {{ $t('login.welcome') }}</div>
         <el-divider>{{ $t('login.sign_in') }}</el-divider>
@@ -34,6 +35,7 @@
 
 <script lang="ts" setup>
 import { onMounted, shallowReactive, ref, watch } from 'vue'
+// 替换 Logo
 import logo from '@/public/assets/logo.png'
 import passwordLogin from './components/passwordLogin.vue'
 import wechatLogin from './components/wechatLogin.vue'

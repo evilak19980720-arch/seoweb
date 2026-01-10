@@ -31,7 +31,7 @@
       ]"
     >
       <template #avatar="scope">
-        <cavatar :avatar="scope.row.avatar" :size="35" />
+        <cavatar :avatar="scope.row.avatar" :size="35" :fallback-to-user="false" />
       </template>
       <!-- dialog -->
       <template #dialog="row">

@@ -50,8 +50,8 @@ const appStore = useAppStore()
 
 const { params, loading, submit, form, rules } = useLogin(
   {
-    account: 'catch@admin.com',
-    password: 'catchadmin',
+    account: '',
+    password: '',
     captcha_key: '',
     remember: false
   },
@@ -72,7 +72,6 @@ const getCaptcha = () => {
 watch(
   () => appStore.setting.login?.use_captcha,
   newValue => {
-    console.log(newValue)
     if (newValue) {
       getCaptcha()
     }
