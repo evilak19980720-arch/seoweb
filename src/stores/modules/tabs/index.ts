@@ -30,6 +30,10 @@ export const useNavTabStore = defineStore('nav_tabs', {
     }
   },
 
+  persist: {
+    storage: sessionStorage
+  },
+
   getters: {
     getNavTabs(state): Array<tab> {
       return state.tabs
