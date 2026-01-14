@@ -1,6 +1,5 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import alias from '@rollup/plugin-alias'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { resolve } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -76,6 +75,13 @@ export default defineConfig(({ command, mode }) => {
       assetsDir: 'assets',
       rollupOptions: {
         input: './index.html',
+        onwarn(warning, warn) {
+          // 抑制动态导入与静态导入冲突的警告
+          if (warning.message?.includes('dynamic import will not move module into another chunk')) {
+            return
+          }
+          warn(warning)
+        },
         output: {
           chunkFileNames: 'assets/js/[name]-[hash].js',
 
