@@ -8,13 +8,26 @@ const LANG_CACHE_KEY = 'cached_lang_pack_'
 const LANG_CACHE_TIME_KEY = 'cached_lang_time_'
 const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24小时
 
-const i18n = createI18n({
-  locale: Cache.get('language') || 'zh',
-  fallbackLocale: 'zh',
-  globalInjection: true,
-  legacy: false,
-  messages: {}
-})
+// HMR 状态保持：通过 import.meta.hot.data 在热更新时复用 i18n 实例
+const i18n = (() => {
+  if (import.meta.hot?.data?.i18n) {
+    return import.meta.hot.data.i18n
+  }
+
+  const instance = createI18n({
+    locale: Cache.get('language') || 'zh',
+    fallbackLocale: 'zh',
+    globalInjection: true,
+    legacy: false,
+    messages: {}
+  })
+
+  if (import.meta.hot) {
+    import.meta.hot.data.i18n = instance
+  }
+
+  return instance
+})()
 
 declare module 'vue-i18n' {
   interface I18n {
