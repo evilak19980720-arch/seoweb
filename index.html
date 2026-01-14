@@ -261,49 +261,47 @@
 
 <div id="app"></div>
 <script>
-    // 简单直接的百分比动画
-    function startProgressAnimation() {
-        let progress = 0
-        const percentageElement = document.querySelector('.app-loading-percentage')
+    // 进度动画控制
+    let progress = 0
+    let animationId = null
+    const percentageElement = document.querySelector('.app-loading-percentage')
 
-        if (!percentageElement) {
-            return
+    function updateProgress() {
+        if (!percentageElement) return
+        // 快速增长到 90%，然后等待实际加载完成
+        if (progress < 90) {
+            progress += Math.random() * 3 + 2
+            if (progress > 90) progress = 90
         }
-
-        function updateProgress() {
-            // 随机增长 1-3%
-            progress += Math.random() * 2 + 1
-
-            if (progress >= 100) {
-                progress = 100
-            }
-
-            percentageElement.textContent = Math.floor(progress) + '%'
-
-            if (progress < 100) {
-                setTimeout(updateProgress, 100 + Math.random() * 100)
-            }
+        percentageElement.textContent = Math.floor(progress) + '%'
+        if (progress < 90) {
+            animationId = setTimeout(updateProgress, 80)
         }
-
-        updateProgress()
     }
 
-    // 立即启动
-    setTimeout(startProgressAnimation, 100)
+    // 立即启动进度动画
+    setTimeout(updateProgress, 50)
 
-    // 页面加载完成后隐藏loading
-    window.addEventListener('load', function () {
-        // 确保至少显示2秒钟，给用户良好的视觉体验
-        setTimeout(() => {
-            const loadingElement = document.getElementById('app-loading')
-            if (loadingElement) {
-                loadingElement.style.opacity = '0'
-                setTimeout(() => {
-                    loadingElement.style.display = 'none'
-                }, 600)
-            }
-        }, 2000)
-    })
+    // 隐藏 loading 的函数（供 Vue 应用调用）
+    window.hideAppLoading = function() {
+        if (animationId) clearTimeout(animationId)
+        if (percentageElement) percentageElement.textContent = '100%'
+        
+        const loadingElement = document.getElementById('app-loading')
+        if (loadingElement) {
+            loadingElement.style.opacity = '0'
+            setTimeout(() => {
+                loadingElement.style.display = 'none'
+            }, 400)
+        }
+    }
+
+    // 兜底：如果 Vue 应用 10 秒内没有调用 hideAppLoading，自动隐藏
+    setTimeout(() => {
+        if (document.getElementById('app-loading')?.style.display !== 'none') {
+            window.hideAppLoading()
+        }
+    }, 10000)
 </script>
 <script type="module" src="/src/main.ts"></script>
 <script src="./static/config.js"></script>
