@@ -6,8 +6,10 @@
 import * as Vue from 'vue'
 import * as VueRouter from 'vue-router'
 import * as Pinia from 'pinia'
-import ElementPlus from 'element-plus'
-import * as HeroIcons from '@heroicons/vue/24/outline'
+// Element Plus 改为懒加载，避免按需加载时 tree-shake 导致模块残缺
+// import ElementPlus from 'element-plus'
+// Heroicons 改为懒加载减少初始体积
+// import * as HeroIcons from '@heroicons/vue/24/outline'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
 
 
@@ -27,6 +29,9 @@ export class PluginContext {
     this.initLazyModules()
   }
 
+  /** Element Plus 是否已预热 */
+  private elementPlusWarmed = false
+
   /**
    * 初始化核心模块（必须预加载）
    */
@@ -40,13 +45,7 @@ export class PluginContext {
     // Pinia 状态管理
     this.moduleCache['pinia'] = Pinia
 
-    // Element Plus UI 框架
-    this.moduleCache['element-plus'] = ElementPlus
-
-    // Heroicons 图标
-    this.moduleCache['@heroicons/vue/24/outline'] = HeroIcons
-
-    // Element Plus Icons
+    // Element Plus Icons（体积小，可预加载）
     this.moduleCache['@element-plus/icons-vue'] = ElementPlusIcons
   }
 
@@ -55,6 +54,14 @@ export class PluginContext {
    * 这些模块只在被 import 时才会加载
    */
   private initLazyModules(): void {
+    // Element Plus - 运行时动态导入确保获取完整模块（不受 Vite tree-shake 影响）
+    this.lazyModules['element-plus'] = () => import('element-plus')
+
+    // Heroicons - 懒加载减少初始体积
+    this.lazyModules['@heroicons/vue/24/outline'] = () => import('@heroicons/vue/24/outline')
+    this.lazyModules['@heroicons/vue/24/solid'] = () => import('@heroicons/vue/24/solid')
+    this.lazyModules['@heroicons/vue/20/solid'] = () => import('@heroicons/vue/20/solid')
+
     // VueUse 工具库
     this.lazyModules['@vueuse/core'] = () => import('@vueuse/core')
 
@@ -305,6 +312,30 @@ export class PluginContext {
   async preloadModules(moduleNames: string[]): Promise<void> {
     const promises = moduleNames.map(name => this.getModule(name))
     await Promise.all(promises)
+  }
+
+  /**
+   * 预热 Element Plus（加载远程组件前调用）
+   * 确保 Element Plus 完整模块已加载到缓存
+   */
+  async warmupElementPlus(): Promise<void> {
+    if (this.elementPlusWarmed) return
+    
+    try {
+      const ep = await import('element-plus')
+      this.moduleCache['element-plus'] = ep
+      this.elementPlusWarmed = true
+      console.log('[PluginContext] Element Plus 预热完成')
+    } catch (error) {
+      console.error('[PluginContext] Element Plus 预热失败:', error)
+    }
+  }
+
+  /**
+   * 检查 Element Plus 是否已预热
+   */
+  isElementPlusWarmed(): boolean {
+    return this.elementPlusWarmed
   }
 }
 

@@ -138,6 +138,9 @@ export async function loadRemoteComponent(url: string): Promise<Component> {
 
   const promise = (async () => {
     try {
+      // 预热 Element Plus，确保远程组件可用完整的 EP 模块
+      await pluginContext.warmupElementPlus()
+      
       const component = await loadModule(url, loaderOptions as any) as Component
       if (!component) throw new Error('Component is undefined')
       // markRaw: 避免 Vue 将组件转为响应式对象（性能优化）
