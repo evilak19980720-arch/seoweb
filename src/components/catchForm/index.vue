@@ -9,7 +9,7 @@ import { onMounted, ref, watch } from 'vue'
 import http from '@/support/http'
 import { useFormSubmit } from '@/composables/curd/useFormSubmit'
 import { useShow } from '@/composables/curd/useShow'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 interface Config {
   api: string
   rules: Array

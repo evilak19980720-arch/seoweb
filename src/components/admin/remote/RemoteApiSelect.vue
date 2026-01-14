@@ -16,7 +16,7 @@
 </template>
 <script lang="ts" setup>
 import { useGetDataByApi } from '@/composables/useGetRemoteTableData'
-import _ from 'lodash'
+import { get } from 'lodash-es'
 const props = defineProps({
   api: {
     type: String,
@@ -33,7 +33,7 @@ const props = defineProps({
 })
 
 const getRowData = (row: any, path: string) => {
-  return _.get(row, path)
+  return get(row, path)
 }
 const modelValue = defineModel()
 

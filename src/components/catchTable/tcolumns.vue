@@ -116,7 +116,7 @@ import Ellipsis from './components/ellipsis/index.vue'
 import SwitchColumn from './components/switchColumn/index.vue'
 import MaskColumn from './components/maskColumn/index.vue'
 import { Picture as IconPicture } from '@element-plus/icons-vue'
-import _ from 'lodash'
+import { get } from 'lodash-es'
 interface Props {
   column: Column
   api: string
@@ -137,7 +137,7 @@ const getImage = (src: string | Array<string>) => {
 
 const getRowData = (row: any, path: string) => {
   // 这是暂时使用 undefined 做字段权限的条件
-  const res = _.get(row, path)
+  const res = get(row, path)
   if (isUndefined(res)) {
     return false
   }
