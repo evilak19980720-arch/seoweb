@@ -44,8 +44,8 @@ export default class CatchAdmin {
       // 先初始化非异步组件
       this.useElementPlus().usePinia()
 
-      // 异步加载 i18n
-      await this.useI18n()
+      // 异步加载 i18n（与路由初始导航并行）
+      const i18nTask = this.useI18n()
 
       // 继续初始化其他组件
       this.installDirectives()
@@ -56,8 +56,11 @@ export default class CatchAdmin {
         .useFormCreate()
         .initAppSetting()
         .useVersionPolling()
-        .usePluginSystem()  // 初始化插件系统
-        .mount()
+        .usePluginSystem() // 初始化插件系统
+
+      await Promise.all([i18nTask, router.isReady()])
+      this.mount()
+      this.hideAppLoading()
     } catch (error) {
       console.error('应用启动失败:', error)
     }
@@ -70,6 +73,13 @@ export default class CatchAdmin {
    */
   protected mount(): void {
     this.app.mount(this.element)
+  }
+
+  protected hideAppLoading(): void {
+    const hideAppLoading = (window as Window & { hideAppLoading?: () => void }).hideAppLoading
+    if (typeof hideAppLoading === 'function') {
+      hideAppLoading()
+    }
   }
 
   /**

@@ -296,12 +296,6 @@
         }
     }
 
-    // 兜底：如果 Vue 应用 10 秒内没有调用 hideAppLoading，自动隐藏
-    setTimeout(() => {
-        if (document.getElementById('app-loading')?.style.display !== 'none') {
-            window.hideAppLoading()
-        }
-    }, 10000)
 </script>
 <script type="module" src="/src/main.ts"></script>
 <script src="./static/config.js"></script>
