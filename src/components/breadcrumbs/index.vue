@@ -2,7 +2,7 @@
   <el-breadcrumb separator="/" class="flex sm:text-sm lg:text-base">
     <transition-group name="breadcrumb">
       <!--<el-breadcrumb-item :to="{ path: '/' }" class="text-blue=">Dashboard</el-breadcrumb-item>-->
-      <el-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index" class="text">{{ item }}</el-breadcrumb-item>
+      <el-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="`breadcrumb-${index}-${item}`" class="text">{{ item }}</el-breadcrumb-item>
     </transition-group>
   </el-breadcrumb>
 </template>
@@ -19,16 +19,16 @@ const breadcrumbs = ref<string[]>([])
 
 // 监听当前路由的变化
 watch(
-  () => router.currentRoute.value,
-  (newValue, oldValue) => {
+  () => router.currentRoute.value.path,
+  () => {
+    const route = router.currentRoute.value
     // 激活菜单
-    if (newValue.meta.active_menu) {
-      appStore.setActiveMenu(newValue.meta.active_menu as string)
+    if (route.meta.active_menu) {
+      appStore.setActiveMenu(route.meta.active_menu as string)
     }
-    setActiveMenu(newValue)
-    getBreadcrumbs(newValue)
-  },
-  { deep: true }
+    setActiveMenu(route)
+    getBreadcrumbs(route)
+  }
 )
 
 // get init breadcrumb
@@ -56,13 +56,15 @@ const setActiveMenu = (route: RouteLocationNormalizedLoaded) => {
 
 // get breadcrums
 function getBreadcrumbs(newRoute: RouteLocationNormalizedLoaded) {
-  breadcrumbs.value = []
-  // breadcrumbs.value.push('首页')
-  newRoute.matched.forEach(m => {
-    if (!isUndefined(m.meta.title)) {
-      breadcrumbs.value.push(m.meta?.title as string)
+  const newBreadcrumbs: string[] = []
+  // newBreadcrumbs.push('首页')
+  newRoute.matched.forEach((m, index) => {
+    if (m.meta?.title) {
+      newBreadcrumbs.push(m.meta.title as string)
     }
   })
+
+  breadcrumbs.value = newBreadcrumbs
 }
 </script>
 
