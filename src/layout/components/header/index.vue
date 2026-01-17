@@ -1,20 +1,22 @@
 <template>
-  <div class="z-20 flex flex-row w-full border-b border-l border-gray-200 dark:border-gray-800 h-14" style="background-color: var(--header-bg-color)">
-    <div class="flex flex-row justify-between w-full h-14">
-      <div class="flex flex-row min-w-[17rem]">
-        <div v-if="store.getLayoutConfigs.showCollapseBtn" class="flex items-center w-8 h-full ml-2 hover:cursor-pointer" @click="store.changeExpaned">
+  <div class="z-20 w-full h-14 bg-[var(--header-bg-color)] border-b border-l border-[var(--el-border-color-lighter)]">
+    <div class="flex items-center justify-between h-full px-3 gap-3">
+      <div class="flex items-center gap-2 min-w-0 sm:min-w-64 flex-1">
+        <div v-if="store.getLayoutConfigs.showCollapseBtn" class="cursor-pointer" @click="store.changeExpaned">
           <Icon name="list-bullet" class="w-6 h-8" />
         </div>
-        <div v-if="store.getLayoutConfigs.showBreadcrumb" class="flex items-center pl-3 w-96 sm:pl-0">
+        <div v-if="store.getLayoutConfigs.showBreadcrumb" class="flex items-center min-w-0">
           <Breadcrumbs />
         </div>
       </div>
 
-      <div class="grid grid-cols-3 sm:grid-cols-6 w-80 sm:min-w-[18rem] pl-1 sm:pl-0 justify-center">
+      <div class="flex items-center gap-1 sm:gap-[0.35rem] shrink-0">
         <!-- 搜索 -->
         <MenuSearch />
         <!-- 多语言 -->
-        <Lang v-if="store.getLayoutConfigs.showLang" />
+        <div v-if="store.getLayoutConfigs.showLang" class="hidden md:grid">
+          <Lang />
+        </div>
         <!-- 暗黑主题 -->
         <Theme />
         <Notification />

@@ -1,18 +1,19 @@
 <template>
-  <!-- 搜索图标触发器 -->
-  <div class="hidden w-10 h-10 mt-2 rounded-full outline-none sm:grid place-items-center hover:cursor-pointer">
-    <Icon name="magnifying-glass" class="hidden sm:block" @click="openSearch" />
-  </div>
+  <div class="menu-search">
+    <!-- 搜索图标触发器 -->
+    <div class="header-action hidden sm:grid">
+      <Icon name="magnifying-glass" class="hidden sm:block" @click="openSearch" />
+    </div>
 
-  <!-- 搜索面板 -->
-  <Teleport to="body">
-    <Transition name="fade">
-      <div
-        v-if="visible"
-        class="fixed inset-0 z-[9999999999999] flex items-start justify-center pt-[10vh] bg-black/50 backdrop-blur-sm"
-        @click.self="closeSearch"
-        @keydown="handleKeydown"
-      >
+    <!-- 搜索面板 -->
+    <Teleport to="body">
+      <Transition name="fade">
+        <div
+          v-if="visible"
+          class="fixed inset-0 z-[9999999999999] flex items-start justify-center pt-[10vh] bg-black/50 backdrop-blur-sm"
+          @click.self="closeSearch"
+          @keydown="handleKeydown"
+        >
         <!-- 搜索卡片 -->
         <div class="w-full max-w-5xl mx-4">
           <!-- 顶部区域 - 与遮罩层融为一体 -->
@@ -95,7 +96,7 @@
 
             <!-- 默认模式：显示树形结构 -->
             <div v-else class="py-2">
-              <template v-for="(menu, menuIndex) in treeMenus" :key="menu.path">
+              <div v-for="(menu, menuIndex) in treeMenus" :key="menu.path" class="menu-group">
                 <!-- 一级菜单分组标题 -->
                 <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
                   {{ menu.title }}
@@ -126,13 +127,14 @@
                     <div class="text-xs text-gray-400 truncate max-w-[200px]">{{ child.path }}</div>
                   </li>
                 </ul>
-              </template>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </Transition>
-  </Teleport>
+      </Transition>
+    </Teleport>
+  </div>
 </template>
 
 <script lang="ts" setup>

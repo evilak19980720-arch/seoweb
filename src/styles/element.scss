@@ -65,3 +65,45 @@
 .el-message {
   z-index: 10000001 !important;
 }
+
+// Header 组件全局样式
+.header-action {
+  @apply w-10 h-10 rounded-xl grid place-items-center cursor-pointer outline-none;
+  @apply transition-all duration-150 ease-in-out;
+  color: var(--el-text-color-regular);
+
+  &:hover {
+    background: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
+    color: var(--el-text-color-primary);
+  }
+
+  &:focus-visible,
+  *:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    background: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
+    color: var(--el-text-color-primary);
+  }
+}
+
+.header-profile {
+  @apply w-11;
+}
+
+.header-breadcrumb {
+  .el-breadcrumb {
+    font-size: 13px;
+  }
+
+  .el-breadcrumb__inner {
+    color: var(--el-text-color-regular);
+    font-weight: 500;
+  }
+
+  .el-breadcrumb__separator {
+    color: var(--el-text-color-placeholder);
+  }
+}
