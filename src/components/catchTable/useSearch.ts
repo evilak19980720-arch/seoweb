@@ -58,12 +58,14 @@ export default function useSearch(api: string | Function, isPagination: boolean,
     getTableData()
   }
 
-  // 重置 || 刷新
+  // 重置搜索条件和页码
   const reset = () => {
     queryStore.setResetQuery()
 
-    // searchParams.value = Object.assign(getDefaultParams(), defaults)
     if (isPagination) {
+      // 重置分页 ref 值，确保 UI 同步
+      page.value = currentPage
+      limit.value = pageLimit
       // 这里会调用 getTableData 方法
       setPaginateParams(currentPage, pageLimit)
     } else {

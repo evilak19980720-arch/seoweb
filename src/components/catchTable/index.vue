@@ -48,8 +48,8 @@
           </div>
           <!---表头 tools-->
           <div class="flex flex-row justify-end w-1/3 tools" v-if="showTools">
-            <!-- 刷新 如果没有搜索，则使用默认的重置，有，就通过 ref 调用搜索的重置 -->
-            <el-button text circle @click="csearchRef ? csearchRef.reset() : reset()">
+            <!-- 刷新 仅刷新当前页数据 -->
+            <el-button text circle @click="csearchRef ? doSearch() : reset()">
               <el-icon><RefreshRight /></el-icon>
             </el-button>
             <!-- 密度 -->
@@ -414,7 +414,7 @@ const showPaginate = () => {
 const { limit, page, total, changeLimit, changePage, doSearch, reset, loading, data, getTableData } = useSearch(props.api, showPaginate(), props.limit, props.page)
 
 // init query
-queryStore.initQuery(showPaginate() ? { page, limit } : {})
+queryStore.initQuery(showPaginate() ? { page: page.value, limit: limit.value } : {})
 
 // 多选 ID
 const multiSelectIds = ref<Array<string | number>>([])
