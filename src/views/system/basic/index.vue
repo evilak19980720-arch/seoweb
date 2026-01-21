@@ -115,14 +115,13 @@ const formData = ref({
 
 const form = ref<FormInstance>()
 
-const submitForm = (form: FormInstance | undefined) => {
+const submitForm = async (form: FormInstance | undefined) => {
   if (!form) return
-  form.validate((valid, fields) => {
+  form.validate(async (valid) => {
     if (valid) {
-      http.post(api, formData.value).then(r => {
-        appStore.setSetting(formData.value)
-        Message.success('配置成功')
-      })
+      await http.post(api, formData.value)
+      await appStore.setSetting()
+      Message.success('配置成功')
     }
   })
 }

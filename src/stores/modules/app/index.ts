@@ -215,8 +215,8 @@ export const useAppStore = defineStore('app', {
       Cache.set('layout_configs', this.layoutConfigs)
     },
 
-    setSetting() {
-      http.get('setting/config').then(r => {
+    async setSetting() {
+      return http.get('setting/config').then(r => {
         if (!isUndefined(r.data.data.dashboard)) {
           this.setting = r.data.data
         }
