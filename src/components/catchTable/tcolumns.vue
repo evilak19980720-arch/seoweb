@@ -20,7 +20,6 @@
   >
     <!-- 自定义 column header 插槽 -->
     <template #header v-if="column.header">
-      {{ column.width }}
       <slot :name="column.header" />
     </template>
     <!-- 插槽内容 -->
