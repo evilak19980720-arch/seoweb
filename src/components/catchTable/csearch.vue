@@ -129,10 +129,10 @@ _fields.value = _fields.value?.map(field => {
     defaults[field.name] = field.default
   }
 
-  // 填充 range 组建的默认
+  // 填充 range 组件的默认值
   if (field.type === 'range' && field.children?.length > 0) {
     field.children?.forEach(item => {
-      if (field.default) {
+      if (item.default) {
         queryStore.getTableQuery[item.name] = item.default
         defaults[item.name] = item.default
       }

@@ -76,11 +76,14 @@ export default function useSearch(api: string | Function, isPagination: boolean,
   const getTableData = () => {
     loading.value = true
     http.get(api as string, queryStore.getTableQuery).then(r => {
-      loading.value = false
       data.value = r.data
       if (isPagination) {
         total.value = r.data.total
       }
+    }).catch(() => {
+      data.value = undefined
+    }).finally(() => {
+      loading.value = false
     })
   }
 
