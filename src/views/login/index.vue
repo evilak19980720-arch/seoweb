@@ -30,6 +30,7 @@
         <div class="w-full mt-8 mb-10 text-sm text-center text-gray-400">{{ $t('system.name') }} @copyright 2018-{{ new Date().getFullYear() }}</div>
       </div>
     </div>
+    <Exception />
   </div>
 </template>
 
@@ -40,6 +41,7 @@ import logo from '@/public/assets/logo.png'
 import passwordLogin from './components/passwordLogin.vue'
 import wechatLogin from './components/wechatLogin.vue'
 import smsLogin from './components/smsLogin.vue'
+import Exception from '@/components/admin/exception/index.vue'
 import emailIcon from './icons/email.vue'
 import mobileIcon from './icons/mobile.vue'
 import wechatIcon from './icons/wechat.vue'
