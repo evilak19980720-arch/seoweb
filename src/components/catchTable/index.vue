@@ -58,8 +58,7 @@
                 <el-icon><More /></el-icon>
                 <template #dropdown>
                   <el-dropdown-menu class="mt-2 w-20">
-                    <el-dropdown-item command="large" v-if="tableSize === 'large'">宽松</el-dropdown-item>
-                    <el-dropdown-item command="large" v-else>宽松</el-dropdown-item>
+                    <el-dropdown-item command="large" :class="{ 'is-active': tableSize === 'large' }">宽松</el-dropdown-item>
                     <el-dropdown-item command="default" divided>默认</el-dropdown-item>
                     <el-dropdown-item command="small" divided>紧凑</el-dropdown-item>
                   </el-dropdown-menu>
@@ -99,6 +98,7 @@
           :border="border"
           :empty-text="emptyText"
           :summary-method="summaryMethod"
+          :span-method="spanMethod"
           :default-sort="sort"
           @sort-change="customSortChange"
           @filter-change="filterChange"
@@ -116,7 +116,6 @@
               v-if="column.show && (column.type === 'selection' || column.type === 'expand')"
               :type="column.type"
               :prop="column.prop"
-              :aligh="column.align"
               :label="column.label"
               :width="column.width"
               :min-width="column['min-width']"
@@ -132,7 +131,6 @@
               v-if="column.show && column.type === 'index'"
               :type="column.type"
               :prop="column.prop"
-              :aligh="column.align"
               :label="column.label"
               :width="column.width"
               :min-width="column['min-width']"
@@ -143,7 +141,6 @@
             <!--- type === operate -->
             <el-table-column
               v-if="column.show && column.type === 'operate'"
-              :aligh="column.align"
               :label="column.label"
               :width="column.width"
               :min-width="column['min-width']"
@@ -299,12 +296,12 @@ const props = defineProps({
   // 排序事件
   sortChange: {
     type: Function,
-    defaualt: null
+    default: null
   },
   // 筛选事件
   filterChange: {
     type: Function,
-    defaualt: null
+    default: null
   },
   searchForm: {
     type: Array<SItem>,
@@ -495,14 +492,11 @@ const showSearch = ref<boolean>(props.searchable)
 
 // 删除
 const { destroy, deleted } = useDestroy(props.destroyConfirm)
-// onMounted
-onMounted(() => {
-  deleted(reset)
-})
 // 恢复
 const { restore, restored } = useRestore()
 // onMounted
 onMounted(() => {
+  deleted(reset)
   restored(reset)
   setDefaultParams(props.defaultParams)
   getTableData()
@@ -576,7 +570,7 @@ watch(
   }
 )
 </script>
-<style scoped scss>
+<style scoped lang="scss">
 :deep(.tools .el-button) {
   background-color: var(--el-fill-color-light) !important;
 }
