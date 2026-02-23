@@ -1,18 +1,20 @@
 import { defineStore } from 'pinia'
 import router from '@/router'
-interface meta {
+
+interface TabMeta {
   title: string
   affix: boolean
 }
-interface tab {
+
+export interface Tab {
   name: string
   fullPath: string
   path: string
   is_active: boolean
-  meta: meta
+  meta: TabMeta
 }
 
-const defaultTab: tab = {
+const defaultTab: Tab = {
   name: 'basic',
   fullPath: '/dashboard/basic',
   path: '/dashboard/basic',
@@ -26,7 +28,8 @@ const defaultTab: tab = {
 export const useNavTabStore = defineStore('nav_tabs', {
   state: () => {
     return {
-      tabs: [defaultTab] as Array<tab>
+      tabs: [defaultTab] as Array<Tab>,
+      refreshKey: 0
     }
   },
 
@@ -35,23 +38,25 @@ export const useNavTabStore = defineStore('nav_tabs', {
   },
 
   getters: {
-    getNavTabs(state): Array<tab> {
+    getNavTabs(state): Array<Tab> {
       return state.tabs
+    },
+
+    getRefreshKey(state): number {
+      return state.refreshKey
     }
   },
 
   actions: {
-    addTabs(Tab: tab): void {
+    addTabs(newTab: Tab): void {
       if (this.tabs.length >= 20) {
         console.log('最多添加 20 个 tab 标签')
         return
       }
 
       let isExist = false
-
-      // eslint-disable-next-line array-callback-return
-      this.tabs.map((t: tab): void => {
-        if (t.name === Tab.name) {
+      this.tabs.forEach((t: Tab) => {
+        if (t.name === newTab.name) {
           isExist = true
           t.is_active = true
         } else {
@@ -60,7 +65,7 @@ export const useNavTabStore = defineStore('nav_tabs', {
       })
 
       if (!isExist) {
-        this.tabs.push(Tab)
+        this.tabs.push(newTab)
       }
     },
 
@@ -74,14 +79,9 @@ export const useNavTabStore = defineStore('nav_tabs', {
       return null
     },
 
-    selectTab(tab: tab): void {
-      // eslint-disable-next-line array-callback-return
-      this.tabs.map(t => {
-        if (t.name === tab.name) {
-          t.is_active = true
-        } else {
-          t.is_active = false
-        }
+    selectTab(tab: Tab): void {
+      this.tabs.forEach(t => {
+        t.is_active = t.name === tab.name
       })
 
       router.push(tab.fullPath)
@@ -89,46 +89,45 @@ export const useNavTabStore = defineStore('nav_tabs', {
 
     removeTab(index: number): void {
       const activeIndex = this.getActiveTabIndex()
-      if (index === activeIndex) {
-        this.tabs = this.tabs.filter((_, idx) => idx !== index)
-        router.push(this.tabs[index - 1].fullPath)
-      } else {
-        const goPath = activeIndex ? this.tabs[activeIndex].fullPath : this.tabs[index - 1].fullPath
-        this.tabs = this.tabs.filter((_, idx) => idx !== index)
-        router.push(goPath)
+      this.tabs.splice(index, 1)
+
+      if (activeIndex === index) {
+        const nextIndex = Math.min(index, this.tabs.length - 1)
+        this.tabs[nextIndex].is_active = true
+        router.push(this.tabs[nextIndex].fullPath)
+      } else if (activeIndex !== null && activeIndex > index) {
+        router.push(this.tabs[activeIndex - 1].fullPath)
       }
     },
 
-    // 右击菜单操作
-    // 刷新
-    refreshCurrentTab() {
-      const index = this.getActiveTabIndex()
-      if (index) {
-        router.replace({ path: this.tabs[index].fullPath })
-
-        // router.push({ path: this.tabs[index].fullPath });
-      }
+    refreshTab(tab: Tab): void {
+      this.selectTab(tab)
+      this.refreshKey++
     },
-    // 关闭当前
-    removeCurrentTab() {
-      const index = this.getActiveTabIndex()
-      if (index) {
-        if (this.tabs[index].meta.affix) {
-          return
-        }
+
+    removeTargetTab(tab: Tab): void {
+      if (tab.meta.affix) {
+        return
+      }
+      const index = this.tabs.findIndex(t => t.name === tab.name)
+      if (index !== -1) {
         this.removeTab(index)
       }
     },
-    // 关闭所有
-    removeAllTabs() {
+
+    removeAllTabs(): void {
       this.tabs = [defaultTab]
-      router.replace({ path: '/dashboard/basic' })
+      router.replace({ path: defaultTab.fullPath })
     },
-    // 关闭其他
-    removeOtherTabs() {
-      const index = this.getActiveTabIndex()
-      if (index) {
-        this.tabs = this.tabs.filter((_, idx) => idx === index || idx === 0)
+
+    removeOtherTabs(targetTab: Tab): void {
+      this.tabs = this.tabs.filter(t => t.meta.affix || t.name === targetTab.name)
+      const hasActive = this.tabs.some(t => t.is_active)
+      if (!hasActive) {
+        const target = this.tabs.find(t => t.name === targetTab.name)
+        if (target) {
+          this.selectTab(target)
+        }
       }
     }
   }
