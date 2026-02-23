@@ -68,42 +68,42 @@
 
 // Header 组件全局样式
 .header-action {
-  @apply w-10 h-10 rounded-xl grid place-items-center cursor-pointer outline-none;
-  @apply transition-all duration-150 ease-in-out;
-  color: var(--el-text-color-regular);
+    @apply w-9 h-9 rounded-lg grid place-items-center cursor-pointer outline-none;
+    @apply transition-all duration-150 ease-in-out;
+    color: var(--el-text-color-regular);
 
-  &:hover {
-    background: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
-    color: var(--el-text-color-primary);
-  }
+    &:hover {
+        background: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
+        color: var(--el-color-primary);
+    }
 
-  &:focus-visible,
-  *:focus-visible {
-    outline: none;
-    box-shadow: none;
-  }
+    &:focus-visible,
+    *:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
 
-  &:focus-visible {
-    background: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
-    color: var(--el-text-color-primary);
-  }
+    &:focus-visible {
+        background: color-mix(in srgb, var(--el-color-primary) 14%, transparent);
+        color: var(--el-color-primary);
+    }
 }
 
 .header-profile {
-  @apply w-11;
+    @apply w-10;
 }
 
 .header-breadcrumb {
-  .el-breadcrumb {
-    font-size: 13px;
-  }
+    .el-breadcrumb {
+        font-size: 13px;
+    }
 
-  .el-breadcrumb__inner {
-    color: var(--el-text-color-regular);
-    font-weight: 500;
-  }
+    .el-breadcrumb__inner {
+        color: var(--el-text-color-regular);
+        font-weight: 500;
+    }
 
-  .el-breadcrumb__separator {
-    color: var(--el-text-color-placeholder);
-  }
+    .el-breadcrumb__separator {
+        color: var(--el-text-color-placeholder);
+    }
 }
