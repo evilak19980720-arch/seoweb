@@ -2,11 +2,11 @@
   <div>
     <!-- 设置按钮 - 固定在顶部右侧 -->
     <div
-      class="fixed top-20 right-4 z-[2000] w-10 h-10 flex items-center justify-center cursor-pointer bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 border border-gray-200 dark:border-gray-700"
+      class="settings-trigger"
       @click="drawer = true"
       title="打开设置"
     >
-      <el-icon :size="20">
+      <el-icon :size="16">
         <Icon name="cog-6-tooth" />
       </el-icon>
     </div>
@@ -260,3 +260,20 @@ const resetConfig = () => {
 }
 </script>
 
+<style scoped>
+.settings-trigger {
+  @apply fixed top-20 right-4 z-[2000] w-9 h-9 flex items-center justify-center cursor-pointer rounded-lg;
+  @apply transition-all duration-200 ease-in-out;
+  background-color: var(--header-bg-color);
+  color: var(--el-text-color-regular);
+  border: 1px solid var(--el-border-color-lighter);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.settings-trigger:hover {
+  color: var(--el-color-primary);
+  border-color: var(--el-color-primary);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  transform: scale(1.05);
+}
+</style>

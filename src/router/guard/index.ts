@@ -48,7 +48,8 @@ const guard = (router: Router) => {
                 redirect: '/404'
               })
             }
-            next({ ...to, replace: true })
+            //next({ ...to, replace: true })
+            next({ path: to.path, query: to.query, hash: to.hash, replace: true })
           } catch (e) {
             Message.error('Vue Route 导航异常: ' + (e as Error).message)
             removeAuthToken()

@@ -45,40 +45,57 @@ const appStore = useAppStore()
   border-right: none;
 }
 
-:deep(.is-active) {
+:deep(.el-menu-item) {
+  height: 48px !important;
+  margin: 4px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 200ms ease;
+  position: relative;
+}
+
+:deep(.el-menu-item .el-icon) {
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+:deep(.el-menu-item:hover) {
+  background-color: var(--sider-sub-menu-hover-bg-color) !important;
+}
+
+:deep(.el-menu-item.is-active) {
   background-color: var(--side-active-menu-bg-color) !important;
+  font-weight: 500;
 }
 
 :deep(.el-sub-menu__title) {
-  padding-left: calc(calc(var(--el-menu-base-level-padding) + var(--el-menu-level) * var(--el-menu-level-padding)));
-
+  padding-left: calc(var(--el-menu-base-level-padding) + var(--el-menu-level) * var(--el-menu-level-padding));
   color: var(--sider-menu-text-color);
+  height: 48px !important;
+  margin: 4px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 200ms ease;
+}
+
+:deep(.el-sub-menu__title .el-icon) {
+  font-size: 14px;
+  margin-right: 5px;
 }
 
 :deep(.el-sub-menu) {
   color: var(--sider-sub-menu-bg-color);
 }
 
+:deep(.el-sub-menu__icon-arrow) {
+  font-size: 10px;
+}
+
 :deep(.el-sub-menu__title:hover) {
-  background-color: var(--sider-menu-bg-color);
+  background-color: var(--sider-sub-menu-hover-bg-color) !important;
 }
 
 :deep(.el-menu--popup .el-menu-item:hover) {
-  background-color: var(--sider-menu-bg-color) !important;
-}
-
-:deep(.el-menu-item:hover) {
   background-color: var(--sider-sub-menu-hover-bg-color) !important;
-  border-right: 3px solid;
-  border-right-color: var(--el-color-primary);
-}
-
-:deep(.el-menu-item.is-active) {
-  border-right: 3px solid;
-  border-right-color: var(--el-color-primary);
-}
-
-:deep(.el-menu-item) {
-  height: 56px !important;
 }
 </style>

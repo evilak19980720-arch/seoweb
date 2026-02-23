@@ -1,21 +1,21 @@
 @use 'element-plus/theme-chalk/dark/css-vars.css';
 
 html.dark {
-  background-color: #161d31;
+  background-color: #0f172a;
   // 侧边栏背景色
-  --sider-bg-color: #283046;
+  --sider-bg-color: #1e293b;
   // header logo 文字颜色
-  --header-logo-text-color: #ffffff;
+  --header-logo-text-color: #f1f5f9;
   // 侧边栏菜单的文字颜色
-  --sider-menu-text-color: #ffffff;
+  --sider-menu-text-color: #94a3b8;
   // sub menu bg color
-  --sider-sub-menu-bg-color: #161d31;
+  --sider-sub-menu-bg-color: #1e293b;
   // 侧边栏子菜单 hover 的颜色
-  --sider-sub-menu-hover-bg-color: #343d55;
+  --sider-sub-menu-hover-bg-color: #334155;
   // 激活文字颜色
   --sider-ment-active-text-color: var(--el-color-primary);
   // 激活时背景色
-  --side-active-menu-bg-color: rgba(255, 255, 255, 0.08);
+  --side-active-menu-bg-color: rgba(255, 255, 255, 0.06);
 
   /* 自定义深色背景颜色 */
   --el-bg-color: var(--sider-sub-menu-hover-bg-color);
@@ -24,8 +24,8 @@ html.dark {
   --header-bg-color: var(--sider-bg-color);
 
   // border color
-  --el-border-color-lighter: #3b4253;
-  --el-fill-color-light: #161d31;
+  --el-border-color-lighter: #334155;
+  --el-fill-color-light: #0f172a;
 
   // side sub menu margin
   --sider-sub-menu-bg-margin: 0px 0.05rem;
@@ -33,5 +33,5 @@ html.dark {
   --el-mask-color: transparent;
 
   // table 头背景色
-  --catch-table-header-bg-color: #343d55;
+  --catch-table-header-bg-color: #334155;
 }

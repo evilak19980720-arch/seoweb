@@ -1,9 +1,7 @@
 <template>
-  <div class="flex w-full main-bg dark:bg-regal-deep-dark" ref="el">
+  <div class="layout-root" ref="el">
     <!--- Main Sider (双栏模式的主菜单栏) -->
-    <Transition name="main-sider">
-      <MainSider v-if="appStore.getVertical" />
-    </Transition>
+    <MainSider v-if="appStore.getVertical" />
     <!--- Sider (单栏模式或双栏模式的子菜单栏) -->
     <Sider />
     <!--content-->
@@ -32,9 +30,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 禁用 MainSider 的过渡动画，避免出现间隙 */
-.main-sider-enter-active,
-.main-sider-leave-active {
-  transition: none;
+.layout-root {
+  @apply flex w-full min-h-screen;
+  background-color: var(--el-bg-color-page, #f1f5f9);
 }
 </style>

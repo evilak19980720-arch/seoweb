@@ -53,10 +53,6 @@ const openUrl = (path: string) => {
   background-color: var(--sider-sub-menu-bg-color);
 }
 
-.ct-menu-item:hover {
-  background-color: var(--sider-sub-menu-hover-bg-color) !important;
-}
-
 :deep(.children-menu .el-sub-menu__title) {
   background-color: var(--sider-sub-menu-bg-color) !important;
 }

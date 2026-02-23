@@ -1,33 +1,32 @@
 <template>
   <div class="main-sider-container w-20 h-screen fixed left-0 top-0 z-[1001] flex-col hidden sm:flex">
     <!-- Logo -->
-    <div class="flex items-center justify-center border-b h-14 logo-bg dark:border-b-gray-800">
-      <img v-if="setting.dashboard.logo" :src="warpHost(setting.dashboard.logo) || LogPng" class="rounded-full h-9 w-9" />
-      <img :src="LogPng" class="rounded-full h-9 w-9" v-else />
+    <div class="main-sider-logo">
+      <img v-if="setting.dashboard.logo" :src="warpHost(setting.dashboard.logo) || LogPng" class="rounded-xl h-9 w-9 shadow-sm" />
+      <img :src="LogPng" class="rounded-xl h-9 w-9 shadow-sm" v-else />
     </div>
 
     <!-- Main Menu Icons -->
-    <div class="main-menu-list flex-1 overflow-y-auto overflow-x-hidden py-2">
+    <div class="main-menu-list flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 space-y-1">
       <div
         v-for="menu in topLevelMenus"
         :key="menu.name"
-        :class="[
-          'main-menu-item',
-          'w-20 py-3 flex flex-col items-center justify-center cursor-pointer transition-colors duration-300 relative',
-          isActiveMenu(menu) ? 'active' : ''
-        ]"
+        :class="['main-menu-item', isActiveMenu(menu) ? 'active' : '']"
         @click="handleMenuClick(menu)"
+        :title="menu.meta?.title"
       >
-        <el-icon class="!w-5 !h-5 mb-1">
-          <Icon :name="menu.meta?.icon || 'squares-2x2'" />
-        </el-icon>
-        <span class="text-xs leading-tight text-center truncate w-full px-1">{{ menu.meta?.title }}</span>
+        <div class="main-menu-icon-wrap">
+          <el-icon class="!w-[22px] !h-[22px]">
+            <Icon :name="menu.meta?.icon || 'squares-2x2'" />
+          </el-icon>
+        </div>
+        <span class="main-menu-label">{{ menu.meta?.title }}</span>
       </div>
     </div>
 
     <!-- Collapse Button -->
-    <div class="flex justify-center items-center p-4 mt-auto cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800" @click="toggleLayout">
-      <el-icon :size="20">
+    <div class="main-sider-collapse" @click="toggleLayout">
+      <el-icon :size="16">
         <Icon :name="appStore.getVertical ? 'chevron-double-left' : 'chevron-double-right'" />
       </el-icon>
     </div>
@@ -93,45 +92,73 @@ const toggleLayout = () => {
 </script>
 
 <style scoped>
-/* 保留 CSS 变量支持主题切换 */
 .main-sider-container {
   background-color: var(--sider-menu-bg-color);
   border-right: 1px solid var(--el-border-color-lighter);
 }
 
-.logo-bg {
+.main-sider-logo {
+  @apply flex items-center justify-center h-14 shrink-0;
   background-color: var(--header-logo-bg-color);
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 .main-menu-item {
+  @apply flex flex-col items-center justify-center py-2 rounded-xl cursor-pointer;
+  @apply transition-all duration-200 ease-in-out;
   color: var(--el-text-color-regular);
 }
 
-.main-menu-item:hover {
-  background-color: var(--sider-sub-menu-hover-bg-color);
+.main-menu-icon-wrap {
+  @apply w-10 h-10 rounded-lg flex items-center justify-center mb-1;
+  @apply transition-all duration-200 ease-in-out;
 }
 
-.main-menu-item.active {
-  background-color: var(--el-color-primary-light-9);
+.main-menu-label {
+  @apply text-[11px] leading-tight text-center w-full px-1;
+  @apply transition-colors duration-200;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+.main-menu-item:hover {
   color: var(--el-color-primary);
 }
 
+.main-menu-item:hover .main-menu-icon-wrap {
+  background: color-mix(in srgb, var(--el-color-primary) 10%, transparent);
+}
 
-/* 自定义滚动条样式 */
+.main-menu-item.active {
+  color: var(--el-color-primary);
+}
+
+.main-menu-item.active .main-menu-icon-wrap {
+  background: color-mix(in srgb, var(--el-color-primary) 12%, transparent);
+  color: var(--el-color-primary);
+}
+
+.main-menu-item.active .main-menu-label {
+  font-weight: 600;
+}
+
+.main-sider-collapse {
+  @apply flex justify-center items-center py-3 cursor-pointer;
+  @apply transition-colors duration-200;
+  color: var(--el-text-color-secondary);
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+
+.main-sider-collapse:hover {
+  color: var(--el-color-primary);
+  background: color-mix(in srgb, var(--el-color-primary) 6%, transparent);
+}
+
+/* 自定义滚动条 */
 .main-menu-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.main-menu-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.main-menu-list::-webkit-scrollbar-thumb {
-  background: rgba(144, 147, 153, 0.3);
-  border-radius: 4px;
-}
-
-.main-menu-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(144, 147, 153, 0.5);
+  width: 0;
 }
 </style>

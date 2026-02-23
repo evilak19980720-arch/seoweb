@@ -20,6 +20,7 @@ interface setting {
   dashboard: {
     name: string
     logo: string
+    homepage: string
   }
 
   login: {
@@ -89,7 +90,8 @@ export const useAppStore = defineStore('app', {
     setting: {
       dashboard: {
         name: '管理后台',
-        logo: ''
+        logo: '',
+        homepage: ''
       },
 
       login: {

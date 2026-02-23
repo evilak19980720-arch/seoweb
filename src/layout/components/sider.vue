@@ -1,17 +1,12 @@
 <template>
   <div>
-    <div :class="sideClass + ' drop-shadow-md'">
+    <div :class="sideClasses" class="sider-container">
       <!--logo -->
       <Logo />
-      <div class="overflow-auto pb-36 h-screen overflow-y">
+      <div class="sider-menu-scroll">
         <!-- menu item -->
-        <Menu :menu-class="'pt-2 ' + menuClass" />
+        <Menu :menu-class="'pt-1 ' + menuClass" />
       </div>
-      <!--
-      <div class="flex fixed bottom-0 justify-center items-center p-4 mt-auto w-full h-16 bg-white border-t cursor-pointer dark:border-t-gray-800 shadow-lg-1 dark:bg-regal-dark">
-        <Icon name="arrows-right-left" className="w-6 h-6" v-if="!appStore.getVertical" @click="appStore.setVertical(true)" />
-        <Icon name="arrows-up-down" v-else @click="appStore.setVertical()" className="w-6 h-6" />
-      </div>-->
     </div>
     <Mask v-if="isMobile && appStore.isExpand" @click="appStore.changeExpaned()" />
   </div>
@@ -23,47 +18,37 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { isMiniScreen } from '@/support/helper'
 
 const isMobile = ref(isMiniScreen())
+const appStore = useAppStore()
 
-// 双栏模式下的样式（无过渡）
-const layoutSideVertical = ' h-screen z-[1000] sm:z-[999] absolute top-0 sm:fixed sider-bg'
-const layoutSideVerticalOpen = 'w-48 left-0 sm:left-20' + layoutSideVertical
-const layoutSideVerticalHidden = 'w-0 sm:w-0 left-0 sm:left-20' + layoutSideVertical
+const sideClasses = computed(() => {
+  const isVertical = appStore.getVertical
+  const isExpand = appStore.isExpand
 
-// 单栏模式下的样式（无过渡）
-const layoutSideSingle = ' h-screen z-[1000] sm:z-0 absolute top-0 left-0 sm:fixed sider-bg'
-const layoutSideSingleOpen = 'w-48' + layoutSideSingle
-const layoutSideSingleHidden = 'w-0 sm:w-16' + layoutSideSingle
+  const base = 'h-screen'
+  const position = isVertical
+    ? 'z-[1000] sm:z-[999] absolute top-0 sm:fixed left-0 sm:left-20'
+    : 'z-[1000] sm:z-0 absolute top-0 left-0 sm:fixed'
 
-// 是否是小屏幕
-const sideClass = computed(() => {
-  // 双栏模式
-  if (appStore.getVertical) {
-    return appStore.isExpand ? layoutSideVerticalOpen : layoutSideVerticalHidden
-  }
-  // 单栏模式
-  return appStore.isExpand ? layoutSideSingleOpen : layoutSideSingleHidden
+  const width = isExpand
+    ? 'sider-expanded'
+    : isVertical
+      ? 'sider-collapsed-vertical'
+      : 'sider-collapsed-single'
+
+  return [base, position, width]
 })
 
-// menu class
 const menuClass = ref<string>()
-// 判断展开状态
-const appStore = useAppStore()
-watch(appStore.$state, state => {
-  // 如果切换到小屏幕，并且是菜单是收缩状态
+
+watch(appStore.$state, () => {
   menuClass.value = isExpandWhenInMobile()
 })
 
-// 监控屏幕大小
 onMounted(() => {
   window.onresize = () => {
-    return (() => {
-      // 如果切换到小屏幕，并且是菜单是收缩状态，则隐藏子菜单
-      isMobile.value = isMiniScreen()
-      menuClass.value = isExpandWhenInMobile()
-    })()
+    isMobile.value = isMiniScreen()
+    menuClass.value = isExpandWhenInMobile()
   }
-
-  // 刷新或者 go back 的时候默认展开菜单
   appStore.isExpand = true
 })
 
@@ -73,32 +58,59 @@ function isExpandWhenInMobile(): string {
 </script>
 
 <style scoped>
-.sider-bg {
+.sider-container {
   background-color: var(--sider-menu-bg-color);
+  border-right: 1px solid var(--el-border-color-lighter);
+  transition: width 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 自定义滚动条样式 */
-.overflow-y::-webkit-scrollbar {
+.sider-expanded {
+  width: 240px;
+}
+
+.sider-collapsed-vertical {
+  width: 0;
+}
+
+@media (min-width: 640px) {
+  .sider-collapsed-vertical {
+    width: 0;
+  }
+}
+
+.sider-collapsed-single {
+  width: 0;
+}
+
+@media (min-width: 640px) {
+  .sider-collapsed-single {
+    width: 64px;
+  }
+}
+
+.sider-menu-scroll {
+  @apply overflow-auto pb-20 flex-1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(144, 147, 153, 0.3) transparent;
+}
+
+.sider-menu-scroll::-webkit-scrollbar {
   width: 2px;
 }
 
-.overflow-y::-webkit-scrollbar-track {
+.sider-menu-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.overflow-y::-webkit-scrollbar-thumb {
+.sider-menu-scroll::-webkit-scrollbar-thumb {
   background: rgba(144, 147, 153, 0.3);
   border-radius: 25px;
-  transition: background-color 0.3s;
 }
 
-.overflow-y::-webkit-scrollbar-thumb:hover {
+.sider-menu-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(144, 147, 153, 0.5);
-}
-
-/* Firefox 滚动条样式 */
-.overflow-y {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(144, 147, 153, 0.3) transparent;
 }
 </style>

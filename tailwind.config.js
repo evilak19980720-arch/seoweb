@@ -10,8 +10,8 @@ module.exports = {
         spacing: 'margin, padding'
       },
       colors: {
-        'regal-dark': '#283046',
-        'regal-deep-dark': '#1E2638'
+        'regal-dark': '#1e293b',
+        'regal-deep-dark': '#0f172a'
       }
     }
   },
