@@ -11,7 +11,7 @@
       </div>
       <!-- 底部版权 -->
       <div class="content-footer">
-        <span>CatchAdmin Pro</span>
+        <span>CatchAdmin</span>
         <span class="mx-1.5">·</span>
         <span>© 2018 ~ {{ year }}</span>
       </div>
