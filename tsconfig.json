@@ -14,7 +14,8 @@
     "allowJs": true,
     "lib": ["esnext", "dom"],
     "skipLibCheck": true,
-    // "types": ["element-plus/golbal"],
+    "types": ["node"],
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["src/*"]
     }

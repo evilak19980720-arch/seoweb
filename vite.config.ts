@@ -62,7 +62,7 @@ export default defineConfig(({ command, mode }) => {
         '/api': {
           target: env.VITE_BASE_URL, // 后端接口地址
           changeOrigin: true, // 修改请求头中的 origin 为目标地址
-          rewrite: (path) => path.replace(/^\/api/, '') // 可选：移除请求路径中的 /api 前缀
+          rewrite: path => path.replace(/^\/api/, '') // 可选：移除请求路径中的 /api 前缀
         }
       }
     },
@@ -84,13 +84,15 @@ export default defineConfig(({ command, mode }) => {
           chunkFileNames: 'assets/js/[name]-[hash].js',
           entryFileNames: 'assets/js/[name]-[hash].js',
           assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
-          manualChunks: {
-            'vue-vendor': ['vue', 'vue-router', 'pinia'],
-            'element-plus': ['element-plus'],
-            'echarts': ['echarts', 'vue-echarts'],
-            'form-create': ['@form-create/element-ui'],
-            'editor': ['@tinymce/tinymce-vue', 'codemirror'],
-            'utils': ['@vueuse/core', 'moment', 'axios']
+          codeSplitting: {
+            groups: [
+              { name: 'vue-vendor', test: /node_modules[\\/](vue|vue-router|pinia)[\\/]/, priority: 30 },
+              { name: 'element-plus', test: /node_modules[\\/]element-plus[\\/]/, priority: 25 },
+              { name: 'echarts', test: /node_modules[\\/](echarts|vue-echarts)[\\/]/, priority: 20 },
+              { name: 'form-create', test: /node_modules[\\/]@form-create[\\/]/, priority: 15 },
+              { name: 'editor', test: /node_modules[\\/](@tinymce|codemirror)[\\/]/, priority: 10 },
+              { name: 'utils', test: /node_modules[\\/](@vueuse|moment|axios)[\\/]/, priority: 5 }
+            ]
           }
         }
       }
