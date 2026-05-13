@@ -28,7 +28,7 @@
           <div v-else class="w-full max-w-md">
             <!-- 文件信息 -->
             <div class="flex gap-3 items-center mb-6">
-              <el-icon class="flex-shrink-0 text-4xl text-blue-500"><Document /></el-icon>
+              <el-icon class="shrink-0 text-4xl text-blue-500"><Document /></el-icon>
               <div class="flex-1 min-w-0">
                 <div class="mb-1 text-base font-medium text-gray-800 truncate" :title="state.fileName">
                   {{ state.fileName }}
@@ -88,7 +88,7 @@
 
               <!-- 错误信息 -->
               <div v-if="state.error" class="flex gap-2 items-center p-3 mt-4 text-sm text-red-500 bg-red-50 rounded border border-red-200">
-                <el-icon class="flex-shrink-0"><WarningFilled /></el-icon>
+                <el-icon class="shrink-0"><WarningFilled /></el-icon>
                 <span>{{ state.error }}</span>
               </div>
             </div>

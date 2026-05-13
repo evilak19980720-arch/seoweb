@@ -3,7 +3,7 @@
     <h2 class="pb-3 mb-8 text-3xl font-bold text-gray-800 border-b-2 border-blue-500">分片上传示例</h2>
 
     <!-- v-model使用示例 -->
-    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-sm">
+    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-xs">
       <h3 class="mb-4 text-xl font-semibold text-gray-700">v-model获取文件路径</h3>
       <p class="mb-4 text-sm text-gray-600">使用v-model可以直接获取上传成功后的文件路径：</p>
 
@@ -16,7 +16,7 @@
     </div>
 
     <!-- 基本使用示例 -->
-    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-sm">
+    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-xs">
       <h3 class="mb-4 text-xl font-semibold text-gray-700">基本使用（简洁模式）</h3>
       <p class="mb-4 text-sm text-gray-600">默认只显示进度条，不显示分片技术细节：</p>
 
@@ -24,7 +24,7 @@
     </div>
 
     <!-- 显示分片信息示例 -->
-    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-sm">
+    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-xs">
       <h3 class="mb-4 text-xl font-semibold text-gray-700">显示分片信息（调试模式）</h3>
       <p class="mb-4 text-sm text-gray-600">如需查看详细的分片上传进度，可开启分片信息显示：</p>
 
@@ -32,7 +32,7 @@
     </div>
 
     <!-- 自定义配置示例 -->
-    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-sm">
+    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-xs">
       <h3 class="mb-4 text-xl font-semibold text-gray-700">自定义配置</h3>
       <p class="mb-4 text-sm text-gray-600">可以配置文件大小限制、分片大小、文件类型等：</p>
 
@@ -49,7 +49,7 @@
     </div>
 
     <!-- 程序化控制示例 -->
-    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-sm">
+    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-xs">
       <h3 class="mb-4 text-xl font-semibold text-gray-700">程序化控制</h3>
       <p class="mb-4 text-sm text-gray-600">可以通过代码控制文件上传：</p>
 

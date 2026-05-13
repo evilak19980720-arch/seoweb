@@ -21,6 +21,7 @@ const store = useAppStore()
 const setting = computed(() => store.getSetting)
 </script>
 <style scoped>
+@reference "tailwindcss";
 .logo-container {
   @apply flex items-center justify-center h-14 shrink-0;
   background-color: var(--header-logo-bg-color);

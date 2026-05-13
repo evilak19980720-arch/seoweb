@@ -30,6 +30,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 .layout-root {
   @apply flex w-full min-h-screen;
   background-color: var(--el-bg-color-page, #f1f5f9);

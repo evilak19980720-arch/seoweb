@@ -91,6 +91,7 @@ if (getTimeFromStorage() > 0) {
 }
 </script>
 <style scoped>
+@reference "tailwindcss";
 :deep(.code) {
   @apply w-3/5;
 }

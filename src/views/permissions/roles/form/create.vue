@@ -208,6 +208,7 @@ const getParent = (parentId: any) => {
 }
 </script>
 <style scoped>
+@reference "tailwindcss";
 :deep(.el-tree .el-tree__empty-block .el-tree__empty-text) {
   @apply left-10 top-4;
 }

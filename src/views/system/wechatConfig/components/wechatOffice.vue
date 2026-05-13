@@ -74,6 +74,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 :deep(.el-divider .el-divider__text) {
   @apply text-base;
 }

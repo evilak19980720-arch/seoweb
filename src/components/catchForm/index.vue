@@ -143,8 +143,10 @@ onMounted(() => {
 })
 </script>
 <style scoped>
+@reference "tailwindcss";
 /* Add your styles here */
 :deep(.fc-form-footer .fc-form-item .el-form-item__content) {
-  @apply flex justify-end !important;
+  display: flex !important;
+  justify-content: flex-end !important;
 }
 </style>

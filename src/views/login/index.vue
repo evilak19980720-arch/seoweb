@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-center h-screen bg-gray-50">
-    <div class="flex w-full sm:w-[32rem] shadow bg-white lg:rounded-lg">
+    <div class="flex w-full sm:w-[32rem] shadow-sm bg-white lg:rounded-lg">
       <!--<div class="hidden w-1/2 sm:block">
               <img src="@/public/assets/login-left.png" />
             </div>-->
@@ -94,6 +94,7 @@ watch(
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 :deep(.el-form-item__content) {
   margin-left: 0 !important;
 }

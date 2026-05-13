@@ -77,7 +77,7 @@
               v-for="color in themeColors"
               :key="color"
               :class="[
-                'w-6 h-6 rounded-full cursor-pointer flex items-center justify-center transition-all border-2 flex-shrink-0',
+                'w-6 h-6 rounded-full cursor-pointer flex items-center justify-center transition-all border-2 shrink-0',
                 currentThemeColor === color
                   ? 'border-white shadow-[0_0_0_2px_#409EFF] scale-110'
                   : 'border-transparent hover:scale-110'
@@ -261,6 +261,7 @@ const resetConfig = () => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 .settings-trigger {
   @apply fixed top-20 right-4 z-[2000] w-9 h-9 flex items-center justify-center cursor-pointer rounded-lg;
   @apply transition-all duration-200 ease-in-out;

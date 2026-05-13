@@ -33,7 +33,7 @@ const contextMenuRef = ref<InstanceType<typeof ContextMenu>>()
         <span
           v-if="!tag.meta.affix"
           :class="[
-            'rounded-sm p-0.5 transition-opacity duration-150 group-hover:opacity-100',
+            'rounded-xs p-0.5 transition-opacity duration-150 group-hover:opacity-100',
             'hover:bg-[color-mix(in_srgb,var(--el-color-primary)_15%,transparent)] hover:text-[var(--el-color-primary)]',
             tag.is_active
               ? 'opacity-60 text-[var(--el-color-primary)]'

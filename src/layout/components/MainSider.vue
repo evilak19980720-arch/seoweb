@@ -2,8 +2,8 @@
   <div class="main-sider-container w-20 h-screen fixed left-0 top-0 z-[1001] flex-col hidden sm:flex">
     <!-- Logo -->
     <div class="main-sider-logo">
-      <img v-if="setting.dashboard.logo" :src="warpHost(setting.dashboard.logo) || LogPng" class="rounded-xl h-9 w-9 shadow-sm" />
-      <img :src="LogPng" class="rounded-xl h-9 w-9 shadow-sm" v-else />
+      <img v-if="setting.dashboard.logo" :src="warpHost(setting.dashboard.logo) || LogPng" class="rounded-xl h-9 w-9 shadow-xs" />
+      <img :src="LogPng" class="rounded-xl h-9 w-9 shadow-xs" v-else />
     </div>
 
     <!-- Main Menu Icons -->
@@ -92,6 +92,7 @@ const toggleLayout = () => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 .main-sider-container {
   background-color: var(--sider-menu-bg-color);
   border-right: 1px solid var(--el-border-color-lighter);

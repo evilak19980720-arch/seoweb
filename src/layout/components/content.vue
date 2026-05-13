@@ -43,6 +43,7 @@ const year = computed(() => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 .content-wrapper {
   transition: margin-left 280ms cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;

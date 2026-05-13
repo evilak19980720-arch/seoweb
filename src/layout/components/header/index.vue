@@ -47,6 +47,7 @@ const store = useAppStore()
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 .header-bar {
   background-color: var(--header-bg-color);
   border-bottom: 1px solid var(--el-border-color-lighter);

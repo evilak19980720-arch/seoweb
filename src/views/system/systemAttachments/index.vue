@@ -272,6 +272,7 @@ onMounted(() => {
 })
 </script>
 <style scoped>
+@reference "tailwindcss";
 :deep(.el-tree-node) {
   @apply mt-2;
 }

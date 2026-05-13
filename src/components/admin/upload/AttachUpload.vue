@@ -151,6 +151,7 @@ const isFile = (filename: string) => {
 }
 </script>
 <style scoped>
+@reference "tailwindcss";
 :deep(.el-dialog__body) {
   @apply pt-3;
 }

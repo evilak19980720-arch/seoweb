@@ -27,6 +27,7 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
 }
 </script>
 <style scoped>
+@reference "tailwindcss";
 :deep(.el-tabs__nav > .is-active) {
   @apply text-base;
 }

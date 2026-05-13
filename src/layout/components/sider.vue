@@ -58,6 +58,7 @@ function isExpandWhenInMobile(): string {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 .sider-container {
   background-color: var(--sider-menu-bg-color);
   border-right: 1px solid var(--el-border-color-lighter);

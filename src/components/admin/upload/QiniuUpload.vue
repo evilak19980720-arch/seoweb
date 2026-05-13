@@ -183,6 +183,7 @@ const uploadFiles = (options: UploadRequestOptions) => {
 }
 </script>
 <style scoped>
+@reference "tailwindcss";
 :deep(.el-upload-list__item) {
   @apply w-24 h-24;
 }

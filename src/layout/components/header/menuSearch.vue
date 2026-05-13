@@ -31,7 +31,7 @@
                 v-model="searchKeyword"
                 type="text"
                 placeholder="搜索页面，支持名称、标识以及URL的模糊查询"
-                class="flex-1 text-sm bg-transparent border-none outline-none text-white placeholder-white/50"
+                class="flex-1 text-sm bg-transparent border-none outline-hidden text-white placeholder-white/50"
                 @keydown.down.prevent="selectNext"
                 @keydown.up.prevent="selectPrev"
                 @keydown.enter.prevent="navigateToSelected"
@@ -78,7 +78,7 @@
                 @mouseenter="selectedIndex = index"
               >
                 <!-- 菜单图标 -->
-                <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
+                <div class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
                   <Icon :name="item.icon || 'document'" class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 </div>
                 <!-- 菜单信息 -->
@@ -116,7 +116,7 @@
                     @mouseenter="setSelected(menuIndex, childIndex)"
                   >
                     <!-- 菜单图标 -->
-                    <div class="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-md bg-gray-100 dark:bg-gray-700">
+                    <div class="shrink-0 w-7 h-7 flex items-center justify-center rounded-md bg-gray-100 dark:bg-gray-700">
                       <Icon :name="child.icon || 'document'" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
                     </div>
                     <!-- 菜单信息 -->

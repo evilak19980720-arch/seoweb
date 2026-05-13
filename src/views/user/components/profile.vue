@@ -85,6 +85,7 @@ afterCreate.value = () => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 :deep(.el-upload) {
   @apply h-full w-full;
 }

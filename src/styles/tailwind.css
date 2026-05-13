@@ -1,16 +1,52 @@
-@tailwind base;
+@import "tailwindcss";
+
+@source "../../index.html";
+@source "../**/*.{vue,js,ts,jsx,tsx}";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-regal-dark: #1e293b;
+  --color-regal-deep-dark: #0f172a;
+  --default-ring-width: 3px;
+  --default-ring-color: var(--color-blue-500);
+}
+
+@utility transition-width {
+  transition-property: width;
+}
 
 @layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer components {
   .layout-sider {
     @apply absolute left-0 z-0 duration-300 ease-linear top-16 sm:static transition-width;
   }
 
   .layout-sider-open {
-    @apply w-64 layout-sider;
+    @apply absolute left-0 z-0 duration-300 ease-linear top-16 sm:static transition-width w-64;
   }
 
   .layout-sider-hidden {
-    @apply w-0 layout-sider lg:w-20;
+    @apply absolute left-0 z-0 duration-300 ease-linear top-16 sm:static transition-width w-0 lg:w-20;
   }
 
   .layout-sider-mask {
@@ -21,6 +57,3 @@
     @apply pb-6 pl-2 pr-2 mt-2 bg-white rounded-lg dark:bg-regal-dark;
   }
 }
-
-@tailwind components;
-@tailwind utilities;

@@ -32,6 +32,7 @@ const clickDepartment = (node: any) => {
 </script>
 
 <style scoped>
+@reference "tailwindcss";
 :deep(.el-tree .el-tree-node) {
   @apply p-0.5;
 }
