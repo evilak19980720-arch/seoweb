@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <Editor :api-key="aipKey" :init="config" v-model="content" v-bind="$attrs" />
+    <Editor :api-key="aipKey" :tinymce-script-src="tingmceSrc" :init="config" v-model="content" v-bind="$attrs" />
     <el-button :class="uploadButtonClass" @click="openDialog()"><Icon name="cloud-arrow-up" class="mr-1" />选择附件</el-button>
     <!-- Dialog -->
     <Dialog v-model="attachVisible" width="1200px" title="选择附件" append-to-body :z-index="999999">
@@ -11,40 +11,6 @@
 
 <script setup lang="ts">
 import Attachment from '@/views/system/systemAttachments/index.vue'
-import '@/public/tinymce/tinymce.min'
-import '@/public/tinymce/themes/silver/theme.min'
-import '@/public/tinymce/icons/default/icons.min'
-import '@/public/tinymce/models/dom/model.min'
-// css
-import '@/public/tinymce/skins/ui/oxide/skin.min.css'
-
-// plugins
-import '@/public/tinymce/plugins/preview/plugin.min'
-import '@/public/tinymce/plugins/searchreplace/plugin.min'
-import '@/public/tinymce/plugins/autolink/plugin.min'
-import '@/public/tinymce/plugins/directionality/plugin.min'
-import '@/public/tinymce/plugins/visualblocks/plugin.min'
-import '@/public/tinymce/plugins/visualchars/plugin.min'
-import '@/public/tinymce/plugins/fullscreen/plugin.min'
-import '@/public/tinymce/plugins/image/plugin.min'
-import '@/public/tinymce/plugins/link/plugin.min'
-import '@/public/tinymce/plugins/media/plugin.min'
-import '@/public/tinymce/plugins/template/plugin.min'
-import '@/public/tinymce/plugins/code/plugin.min'
-import '@/public/tinymce/plugins/codesample/plugin.min'
-import '@/public/tinymce/plugins/table/plugin.min'
-import '@/public/tinymce/plugins/charmap/plugin.min'
-import '@/public/tinymce/plugins/pagebreak/plugin.min'
-import '@/public/tinymce/plugins/nonbreaking/plugin.min'
-import '@/public/tinymce/plugins/anchor/plugin.min'
-import '@/public/tinymce/plugins/insertdatetime/plugin.min'
-import '@/public/tinymce/plugins/advlist/plugin.min'
-import '@/public/tinymce/plugins/lists/plugin.min'
-import '@/public/tinymce/plugins/wordcount/plugin.min'
-import '@/public/tinymce/plugins/autosave/plugin.min'
-import '@/public/tinymce/plugins/emoticons/plugin.min'
-// lang
-import '@/public/tinymce/langs/zh-Hans'
 
 import Editor from '@tinymce/tinymce-vue'
 import { getBaseUrl, getFileExt, getFilename, warpHost } from '@/support/helper'
@@ -54,6 +20,8 @@ import { ref, watch } from 'vue'
 import { IMAGE_EXTENSIONS } from '@/composables/useUpload'
 
 const attachVisible = ref<boolean>(false)
+const tinymceBaseUrl = new URL('tinymce', document.baseURI).pathname
+const tingmceSrc = `${tinymceBaseUrl}/tinymce.min.js`
 const props = defineProps({
   width: {
     type: [Number, String],
@@ -119,10 +87,10 @@ const multiAttach = ref(true)
 const uploadButtonClassWhenFullscreen: string = 'fixed right-2 top-2 z-[999999]'
 const uploadButtonClassWhenNotFullscreen: string = 'absolute right-2 top-2 z-[999999]'
 const uploadButtonClass = ref<string>(uploadButtonClassWhenNotFullscreen)
-const tinymce = ref()
+const editorRef = ref()
 const attachments = ref<Array<string>>([])
 const config = {
-  base_url: '@/public/tinymce',
+  base_url: tinymceBaseUrl,
   language: props.language,
   placeholder: props.placeholder,
   width: props.width,
@@ -133,7 +101,7 @@ const config = {
   // menubar: false,
   images_upload_handler: uploaded,
   setup(editor: any) {
-    tinymce.value = editor
+    editorRef.value = editor
     editor.on('FullscreenStateChanged', (e: any) => {
       // _this.fullscreen = e.state
       uploadButtonClass.value = e.state ? uploadButtonClassWhenFullscreen : uploadButtonClassWhenNotFullscreen
@@ -188,7 +156,7 @@ const closeDialog = () => {
       html += `<p><a href="${attachment}">${filename}</a></p> `
     }
   })
-  tinymce.value.insertContent(html)
+  editorRef.value.insertContent(html)
   attachments.value = []
   attachVisible.value = false
 }
