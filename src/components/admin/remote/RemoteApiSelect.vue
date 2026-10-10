@@ -22,6 +22,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  searchField: {
+    type: String,
+    default: 'keywords'
+  },
   label: {
     type: String,
     default: 'name'
@@ -37,7 +41,7 @@ const getRowData = (row: any, path: string) => {
 }
 const modelValue = defineModel()
 
-const { options, loading, page, limit, total, filter } = useGetDataByApi(props.api)
+const { options, loading, page, limit, total, filter } = useGetDataByApi(props.api, props.searchField)
 
 const changePage = (p: number) => {
   page.value = p

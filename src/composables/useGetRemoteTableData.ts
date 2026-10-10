@@ -91,7 +91,7 @@ export function useGetRemoteTablePaginateData(table: string, value: string, labe
   return { options, loading, page, limit, total, filter }
 }
 
-export function useGetDataByApi(api: string) {
+export function useGetDataByApi(api: string, searchField: string = 'keywords') {
   const loading = ref<boolean>(false)
   const page = ref<number>(1)
   const limit = ref<number>(10)
@@ -102,7 +102,7 @@ export function useGetDataByApi(api: string) {
   const getTableData = () => {
     loading.value = true
     http
-      .get(api, { limit: limit.value, page: page.value, keywords: filter.value })
+      .get(api, { limit: limit.value, page: page.value, [searchField]: filter.value })
       .then(response => {
         const responseData = response.data
         options.value = responseData.data
