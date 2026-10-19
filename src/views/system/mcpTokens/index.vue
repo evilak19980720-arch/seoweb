@@ -5,6 +5,7 @@ import CatchTable from '@/components/catchTable/index.vue'
 import type { Column, SItem } from '@/components/catchTable/ctable'
 import Create from './form/create.vue'
 import TokenCredentials, { type IssuedToken } from './TokenCredentials.vue'
+import UsageLogs from './UsageLogs.vue'
 import { date } from '@/support/helper'
 import http from '@/support/http'
 import Message from '@/support/message'
@@ -28,6 +29,8 @@ const dialogVisible = shallowRef(false)
 const dialogBusy = shallowRef(false)
 const credential = shallowRef<IssuedToken>()
 const pendingId = shallowRef<number | null>(null)
+const usageDialogVisible = shallowRef(false)
+const usageToken = shallowRef<Pick<McpToken, 'id' | 'name'>>()
 const columns: Column[] = ([
   { prop: 'id', label: 'ID', width: 80 },
   { prop: 'name', label: '令牌名称', 'min-width': 180 },
@@ -37,7 +40,7 @@ const columns: Column[] = ([
   { prop: 'last_used_at', label: '最近使用', slot: 'last_used_at', width: 165 },
   { prop: 'last_used_ip', label: '最近使用 IP', slot: 'last_used_ip', width: 150 },
   { prop: 'created_at', label: '创建时间', slot: 'created_at', width: 165 },
-  { type: 'operate', label: '操作', width: 160, update: false, destroy: false }
+  { type: 'operate', label: '操作', width: 250, update: false, destroy: false }
 ] satisfies Partial<Column>[]).map(column => ({ header: '', show: true, preview: false, ...column }))
 const searchForm: (SItem & { label: string })[] = [
   { type: 'input', label: '令牌名称', name: 'name', default: '', options: [] }
@@ -49,6 +52,7 @@ onBeforeRouteLeave(() => {
     return false
   }
   dialogVisible.value = false
+  usageDialogVisible.value = false
   credential.value = undefined
 })
 
@@ -70,6 +74,11 @@ function showCredential(value: IssuedToken): void {
 
 function beforeClose(done: () => void): void {
   if (!dialogBusy.value) done()
+}
+
+function showUsageLogs(row: McpToken): void {
+  usageToken.value = { id: row.id, name: row.name }
+  usageDialogVisible.value = true
 }
 
 async function rotate(row: McpToken): Promise<void> {
@@ -115,6 +124,7 @@ async function revoke(row: McpToken): Promise<void> {
       <template #last_used_ip="scope">{{ scope.row.last_used_ip || '—' }}</template>
       <template #created_at="scope">{{ formatTime(scope.row.created_at) }}</template>
       <template #operate="scope">
+        <el-button v-action="'system.mcpTokens@usageLogs'" type="primary" size="small" text @click="showUsageLogs(scope.row)">使用记录</el-button>
         <el-button v-action="'system.mcpTokens@rotate'" type="primary" size="small" text :disabled="!isAvailable(scope.row) || pendingId !== null" @click="rotate(scope.row)">轮换</el-button>
         <el-button v-action="'system.mcpTokens@destroy'" type="danger" size="small" text :disabled="!!scope.row.revoked_at || pendingId !== null" @click="revoke(scope.row)">撤销</el-button>
       </template>
@@ -134,6 +144,9 @@ async function revoke(row: McpToken): Promise<void> {
         <TokenCredentials v-if="credential" :credential="credential" @close="dialogVisible = false" />
         <Create v-else :api="api" @issued="showCredential" @busy="dialogBusy = $event" @close="dialogVisible = false" />
       </template>
+    </el-dialog>
+    <el-dialog v-model="usageDialogVisible" :title="`${usageToken?.name || ''} · 使用记录`" width="min(1000px, 94vw)" destroy-on-close>
+      <UsageLogs v-if="usageDialogVisible && usageToken" :key="usageToken.id" :api="api" :token-id="usageToken.id" />
     </el-dialog>
   </div>
 </template>
