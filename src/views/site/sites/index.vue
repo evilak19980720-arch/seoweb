@@ -8,7 +8,7 @@
         { label: '网站名称', prop: 'name' },
         { label: '域名', prop: 'domain', slot: 'domain' },
         { label: '语言', prop: 'locale', width: 90 },
-        { label: '服务器', prop: 'server.name' },
+        { label: '解析 IP', prop: 'ip', width: 140 },
         { label: '接入状态', prop: 'onboard_status', slot: 'onboard' },
         { label: '游戏资料', prop: 'profile.status', slot: 'profile', width: 100 },
         { label: '状态', prop: 'status', slot: 'status', width: 90 },

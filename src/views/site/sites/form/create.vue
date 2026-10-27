@@ -11,10 +11,9 @@
         <el-option v-for="item in accounts" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
     </el-form-item>
-    <el-form-item label="服务器" prop="server_id">
-      <el-select v-model="formData.server_id" class="w-full" clearable placeholder="留空自动分配" :disabled="!!primary">
-        <el-option v-for="item in servers" :key="item.value" :label="item.label" :value="item.value" :disabled="item.disabled" />
-      </el-select>
+    <el-form-item label="解析 IP" prop="ip">
+      <el-input v-model="formData.ip" clearable maxlength="45" placeholder="留空使用「全局配置」里的默认解析 IP" />
+      <Prompt text="修改后会自动更新 Cloudflare 上的解析" />
     </el-form-item>
     <el-form-item label="语言" prop="locale" :rules="[{ required: true, message: '请选择语言' }]">
       <el-select v-model="formData.locale" class="w-full">
@@ -71,7 +70,6 @@ if (props.primary) {
 }
 
 const accounts = ref([])
-const servers = ref([])
 const locales = [
   { label: 'Português (Brasil) pt-BR', value: 'pt-BR' },
   { label: 'English en', value: 'en' },
@@ -86,9 +84,6 @@ onMounted(() => {
     if (!props.primary && accounts.value.length === 1) {
       formData.value.cloudflare_account_id = accounts.value[0].value
     }
-  })
-  http.get('site/servers/options').then(r => {
-    servers.value = r.data.data
   })
 })
 </script>
