@@ -10,6 +10,7 @@
         { label: '语言', prop: 'locale', width: 90 },
         { label: '服务器', prop: 'server.name' },
         { label: '接入状态', prop: 'onboard_status', slot: 'onboard' },
+        { label: '游戏资料', prop: 'profile.status', slot: 'profile', width: 100 },
         { label: '状态', prop: 'status', slot: 'status', width: 90 },
         { label: '创建时间', prop: 'created_at' },
         { type: 'operate', label: '操作', width: 220 }
@@ -30,16 +31,24 @@
           <el-tag :type="onboardTag[scope.row.onboard_status]">{{ onboardText[scope.row.onboard_status] }}</el-tag>
         </el-tooltip>
       </template>
+      <template #profile="scope">
+        <el-tag :type="profileTag[scope.row.profile?.status ?? 1]">{{ profileText[scope.row.profile?.status ?? 1] }}</el-tag>
+      </template>
       <template #status="scope">
         <Status v-model="scope.row.status" :id="scope.row.id" :api="api" />
       </template>
       <template #operate="scope">
+        <Show text="游戏资料" icon="document-text" @click="openProfile(scope.row)" />
         <Show v-if="scope.row.onboard_status !== 4" text="重新接入" icon="arrow-path" @click="onboard(scope.row.id)" />
       </template>
       <template #dialog="row">
         <Create :primary="row?.id" :api="api" />
       </template>
     </catch-table>
+
+    <Dialog v-model="profileVisible" :title="profileTitle" width="900px" destroy-on-close>
+      <Profile v-if="profileVisible" :site-id="profileSiteId" @changed="catchtable.doSearch()" />
+    </Dialog>
   </div>
 </template>
 
@@ -49,6 +58,7 @@ import { ref } from 'vue'
 import http from '@/support/http'
 import Message from '@/support/message'
 import Create from './form/create.vue'
+import Profile from './profile.vue'
 
 const api = 'site/sites'
 const catchtable = ref()
@@ -66,6 +76,18 @@ const tooltip = (row: any) => {
     return '请在域名注册商把 NS 改为：' + row.name_servers.join('、')
   }
   return ''
+}
+
+const profileText = { 1: '生成中', 2: '待确认', 3: '已确认', 4: '生成失败' }
+const profileTag = { 1: 'info', 2: 'warning', 3: 'success', 4: 'danger' }
+const profileVisible = ref(false)
+const profileSiteId = ref(0)
+const profileTitle = ref('')
+
+const openProfile = (row: any) => {
+  profileSiteId.value = row.id
+  profileTitle.value = `游戏资料：${row.name}`
+  profileVisible.value = true
 }
 
 const onboard = (id: number) => {
