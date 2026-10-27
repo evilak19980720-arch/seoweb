@@ -57,14 +57,8 @@ export const constantRoutes: RouteRecordRaw[] = [
       {
         path: 'basic',
         name: 'basic',
-        meta: { title: '基础', hidden: false, keepalive: false },
-        component: () => import('@/views/dashboard/server/index.vue')
-      },
-      {
-        path: 'sales',
-        name: 'sales',
-        meta: { title: '销量', hidden: false, keepalive: false },
-        component: () => import('@/views/dashboard/sales/index.vue')
+        meta: { title: '数据概览', hidden: false, keepalive: false },
+        component: () => import('@/views/dashboard/overview/index.vue')
       }
     ]
   }

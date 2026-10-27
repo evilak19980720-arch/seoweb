@@ -52,14 +52,12 @@
           <el-option v-for="item in drivers" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
-      <div v-if="formData.driver === 'oss'">
+      <div v-if="formData.driver === 'local'" class="mb-3 text-sm text-center text-gray-400">图片保存在服务器本地的 storage 目录</div>
+      <div v-if="formData.driver === 'oss'" :key="'oss'">
         <oss :oss="ossData" />
       </div>
-      <div v-if="formData.driver === 'cos'">
-        <cos :cos="ossData" />
-      </div>
-      <div v-if="formData.driver === 'qiniu'">
-        <qiniu :qiniu="ossData" />
+      <div v-if="formData.driver === 's3'" :key="'s3'">
+        <s3 :s3="ossData" />
       </div>
       <div class="flex justify-center">
         <el-button type="primary" @click="submitForm(form)">{{ $t('system.confirm') }}</el-button>
@@ -71,8 +69,7 @@
 // @ts-nocheck
 import { ref, onMounted } from 'vue'
 import oss from './components/oss.vue'
-import cos from './components/cos.vue'
-import qiniu from './components/qiniu.vue'
+import s3 from './components/s3.vue'
 import http from '@/support/http'
 import Message from '@/support/message'
 import type { FormInstance } from 'element-plus'
@@ -103,18 +100,9 @@ const submitForm = (form: FormInstance | undefined) => {
 const ossData = ref({})
 //  上传驱动
 const drivers = [
-  {
-    label: '阿里OSS',
-    value: 'oss'
-  },
-  {
-    label: '腾讯COS',
-    value: 'cos'
-  },
-  {
-    label: '七牛云',
-    value: 'qiniu'
-  }
+  { label: '本地存储', value: 'local' },
+  { label: '阿里云 OSS', value: 'oss' },
+  { label: '亚马逊 S3（兼容 R2 / MinIO）', value: 's3' }
 ]
 
 const selectDriver = async (v: string) => {
@@ -123,7 +111,7 @@ const selectDriver = async (v: string) => {
     const { image_exts, file_exts, limit_size, config } = r.data.data
 
     if (config) {
-      ossData.value = config
+      ossData.value = Array.isArray(config) ? {} : config
     }
     formData.value.driver = r.data.data.driver
     formData.value.image_exts = image_exts
@@ -142,7 +130,7 @@ onMounted(() => {
     formData.value.limit_size = limit_size
     driver.value = r.data.data.driver
     if (config) {
-      ossData.value = config
+      ossData.value = Array.isArray(config) ? {} : config
     }
   })
 })

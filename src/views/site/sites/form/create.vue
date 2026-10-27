@@ -24,6 +24,15 @@
     <el-form-item label="Logo" prop="logo">
       <UploadImage v-model="formData.logo" />
     </el-form-item>
+    <template v-if="!primary">
+      <el-form-item label="模板参考图" prop="reference_image">
+        <UploadImage v-model="formData.reference_image" />
+        <Prompt text="选填。上传一张想要的网站风格截图，AI 会按它生成配色、页头和页脚；生成后在「模板」里预览确认才会启用" />
+      </el-form-item>
+      <el-form-item label="风格说明" prop="style_notes">
+        <el-input v-model="formData.style_notes" type="textarea" :rows="2" maxlength="1000" show-word-limit placeholder="选填。例如：深色背景，霓虹紫，赛博朋克风" />
+      </el-form-item>
+    </template>
     <el-form-item label="标题" prop="title">
       <el-input v-model="formData.title" clearable maxlength="191" show-word-limit />
     </el-form-item>

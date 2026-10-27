@@ -11,9 +11,10 @@
         { label: '解析 IP', prop: 'ip', width: 140 },
         { label: '接入状态', prop: 'onboard_status', slot: 'onboard' },
         { label: '游戏资料', prop: 'profile.status', slot: 'profile', width: 100 },
+        { label: '模板', prop: 'template.status', slot: 'template', width: 100 },
         { label: '状态', prop: 'status', slot: 'status', width: 90 },
         { label: '创建时间', prop: 'created_at' },
-        { type: 'operate', label: '操作', width: 220 }
+        { type: 'operate', label: '操作', width: 260 }
       ]"
       :api="api"
       :search-form="[
@@ -34,11 +35,15 @@
       <template #profile="scope">
         <el-tag :type="profileTag[scope.row.profile?.status ?? 1]">{{ profileText[scope.row.profile?.status ?? 1] }}</el-tag>
       </template>
+      <template #template="scope">
+        <el-tag :type="templateTag[scope.row.template?.status ?? 0]">{{ templateText[scope.row.template?.status ?? 0] }}</el-tag>
+      </template>
       <template #status="scope">
         <Status v-model="scope.row.status" :id="scope.row.id" :api="api" />
       </template>
       <template #operate="scope">
         <Show text="游戏资料" icon="document-text" @click="openProfile(scope.row)" />
+        <Show text="模板" icon="paint-brush" @click="openTemplate(scope.row)" />
         <Show v-if="scope.row.onboard_status !== 4" text="重新接入" icon="arrow-path" @click="onboard(scope.row.id)" />
       </template>
       <template #dialog="row">
@@ -48,6 +53,10 @@
 
     <Dialog v-model="profileVisible" :title="profileTitle" width="900px" destroy-on-close>
       <Profile v-if="profileVisible" :site-id="profileSiteId" @changed="catchtable.doSearch()" />
+    </Dialog>
+
+    <Dialog v-model="templateVisible" :title="templateTitle" width="1200px" destroy-on-close>
+      <Template v-if="templateVisible" :site-id="templateSiteId" @changed="catchtable.doSearch()" />
     </Dialog>
   </div>
 </template>
@@ -59,6 +68,7 @@ import http from '@/support/http'
 import Message from '@/support/message'
 import Create from './form/create.vue'
 import Profile from './profile.vue'
+import Template from './template.vue'
 
 const api = 'site/sites'
 const catchtable = ref()
@@ -88,6 +98,18 @@ const openProfile = (row: any) => {
   profileSiteId.value = row.id
   profileTitle.value = `游戏资料：${row.name}`
   profileVisible.value = true
+}
+
+const templateText = { 0: '默认', 1: '生成中', 2: '待确认', 3: '已启用', 4: '生成失败' }
+const templateTag = { 0: 'info', 1: 'info', 2: 'warning', 3: 'success', 4: 'danger' }
+const templateVisible = ref(false)
+const templateSiteId = ref(0)
+const templateTitle = ref('')
+
+const openTemplate = (row: any) => {
+  templateSiteId.value = row.id
+  templateTitle.value = `站点模板：${row.name}（${row.domain}）`
+  templateVisible.value = true
 }
 
 const onboard = (id: number) => {
