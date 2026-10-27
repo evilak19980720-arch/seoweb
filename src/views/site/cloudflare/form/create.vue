@@ -8,7 +8,7 @@
     </el-form-item>
     <el-form-item label="API Token" prop="api_token" :rules="primary ? [] : [{ required: true, message: 'API Token 必须填写' }]">
       <el-input v-model="formData.api_token" type="password" show-password clearable maxlength="255" :placeholder="primary ? '留空表示不修改' : ''" />
-      <Prompt text="权限需要：Zone 编辑、DNS 编辑、Zone Settings 编辑、SSL and Certificates 读取" />
+      <Prompt text="用「API 令牌」创建自定义令牌（不是 Global API Key）。权限：Zone 编辑、DNS 编辑、Zone Settings 编辑、SSL and Certificates 读取、Cache Purge、Zone Analytics 读取、Account Analytics 读取" />
     </el-form-item>
     <el-form-item label="状态" prop="status">
       <el-radio-group v-model="formData.status">
